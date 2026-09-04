@@ -1,191 +1,183 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#1a2332" />
-  <title>WerkstattKalk</title>
-  <style>
-    :root {
-      --bg: #121821; --bg2: #1a2332; --card: #222c3d; --line: #334058;
-      --text: #eef3f8; --muted: #9aa8b8; --accent: #e8a23a; --ok: #3ecf8e;
-    }
-    * { box-sizing: border-box; }
-    body { margin: 0; font-family: system-ui, Segoe UI, sans-serif; background: var(--bg); color: var(--text); }
-    header { position: sticky; top: 0; display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: #1a2332ee; border-bottom: 1px solid var(--line); }
-    .logo { width: 36px; height: 36px; border-radius: 10px; background: var(--accent); color: #1a1408; display: grid; place-items: center; font-weight: 800; }
-    .brand { flex: 1; } .brand small { display: block; color: var(--muted); font-size: 12px; }
-    .icon { width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--text); }
-    main { max-width: 760px; margin: 0 auto; padding: 16px 16px 48px; }
-    .hero h1 { font-size: 1.7rem; line-height: 1.2; margin: .2rem 0 .8rem; }
-    .eyebrow { color: var(--accent); font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
-    .lede { color: var(--muted); }
-    .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px; margin: 14px 0; }
-    .row { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-    label { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--muted); margin: 8px 0; }
-    input, select, textarea { background: var(--bg); color: var(--text); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; font: inherit; }
-    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    @media (max-width: 560px) { .grid2 { grid-template-columns: 1fr; } }
-    .btn { border: 0; border-radius: 12px; padding: 12px 16px; font-weight: 700; cursor: pointer; font: inherit; }
-    .primary { background: var(--accent); color: #1a1408; }
-    .ghost { background: transparent; color: var(--text); border: 1px solid var(--line); }
-    .link { background: none; border: 0; color: #7eb0ff; cursor: pointer; }
-    .item, .proc { background: var(--bg); border-radius: 12px; padding: 12px; margin: 8px 0; display: flex; justify-content: space-between; gap: 10px; }
-    .ok { color: var(--ok); font-weight: 700; }
-    .muted { color: var(--muted); font-size: 13px; }
-    .big { font-size: 1.7rem; }
-    .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-    dialog { border: 1px solid var(--line); border-radius: 16px; background: var(--bg2); color: var(--text); width: min(92vw, 440px); }
-    dialog::backdrop { background: #0008; }
-    .hidden { display: none; }
-    ul.break { list-style: none; padding: 0; margin: 0; }
-    ul.break li { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--line); }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>WerkstattKalk</title>
+<style>
+:root{--bg:#121821;--bg2:#1a2332;--card:#222c3d;--line:#334058;--text:#eef3f8;--muted:#9aa8b8;--accent:#e8a23a;--ok:#3ecf8e}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,Segoe UI,sans-serif;background:var(--bg);color:var(--text)}
+header{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:12px;padding:12px 16px;background:#1a2332f2;border-bottom:1px solid var(--line)}
+.logo{width:36px;height:36px;border-radius:10px;background:var(--accent);color:#1a1408;display:grid;place-items:center;font-weight:800}
+.brand{flex:1}.brand small{display:block;color:var(--muted);font-size:12px}
+.icon{min-width:44px;min-height:44px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--text);font-size:16px}
+main{max-width:760px;margin:0 auto;padding:16px 16px 56px}h1{font-size:1.65rem;line-height:1.2;margin:.2rem 0 .7rem}h2{margin:0 0 10px;font-size:1.15rem}
+.eyebrow{color:var(--accent);font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}.lede,.muted{color:var(--muted)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin:14px 0}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+label{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted);margin:8px 0}
+input,select,textarea{background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:12px;font:inherit;min-height:44px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}@media(max-width:560px){.grid2{grid-template-columns:1fr}}
+.btn{border:0;border-radius:12px;padding:14px 16px;font-weight:700;cursor:pointer;font:inherit;min-height:48px}
+.primary{background:var(--accent);color:#1a1408}.ghost{background:transparent;color:var(--text);border:1px solid var(--line)}
+.link{background:none;border:0;color:#7eb0ff;cursor:pointer;padding:8px;min-height:44px}
+.item,.proc{background:var(--bg);border-radius:12px;padding:14px;margin:8px 0;display:flex;justify-content:space-between;gap:10px;align-items:center;min-height:56px}
+.ok{color:var(--ok);font-weight:700;text-align:right}.big{font-size:1.55rem}.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+dialog{border:1px solid var(--line);border-radius:16px;background:var(--bg2);color:var(--text);width:min(92vw,440px);padding:16px}dialog::backdrop{background:#0008}
+.hidden{display:none!important}ul.break{list-style:none;padding:0;margin:12px 0 0}ul.break li{display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}
+.hint{font-size:13px;color:var(--muted);margin:0 0 12px}
+</style>
 </head>
 <body>
-  <header>
-    <button class="icon" id="btnBack" hidden>←</button>
-    <div class="logo">WK</div>
-    <div class="brand"><strong>WerkstattKalk</strong><small>Angebotszeiten · Metallbearbeitung</small></div>
-    <button class="icon" id="btnSettings">⚙</button>
-  </header>
-  <main id="home">
-    <section class="hero">
-      <p class="eyebrow">Bereit zum Testen · keine Installation</p>
-      <h1>Zeiten rechnen, ohne Dateien auf dem Handy.</h1>
-      <p class="lede">Drei Beispielteile sind schon hinterlegt. Tippe eines an oder lege ein eigenes Teil an.</p>
-      <div class="actions">
-        <button class="btn primary" id="btnNew">+ Neues Teil</button>
-        <button class="btn ghost" id="btnDemo">Beispiele neu laden</button>
-      </div>
-    </section>
-    <section class="card">
-      <div class="row"><h2>Kalkulationen</h2><button class="link" id="btnClear">Leeren</button></div>
-      <div id="list"></div>
-    </section>
-  </main>
-  <main id="part" class="hidden">
-    <form id="form">
-      <section class="card">
-        <h2>Teil</h2>
-        <label>Bezeichnung <input name="name" required placeholder="z. B. Konsolblech Drehgestell"></label>
-        <div class="grid2">
-          <label>Zeichnungsnr. <input name="drawingNo" placeholder="12345-A"></label>
-          <label>Stückzahl <input name="qty" type="number" min="1" value="1"></label>
-        </div>
-        <div class="grid2">
-          <label>Werkstoff <input name="material" placeholder="S355 / 1.4301"></label>
-          <label>Dicke <input name="thickness" placeholder="8 mm"></label>
-        </div>
-        <label>Notiz <textarea name="note" rows="2" placeholder="Lage, CL1, Besonderheiten"></textarea></label>
-      </section>
-      <section class="card">
-        <div class="row"><h2>Prozesse</h2><button type="button" class="btn ghost" id="btnAdd">+ Prozess</button></div>
-        <div id="procs"></div>
-      </section>
-      <section class="card">
-        <h2>Angebotszeit</h2>
-        <div class="grid2">
-          <div><div class="muted">je Stück</div><div class="big" id="tEach">—</div></div>
-          <div><div class="muted">Los gesamt</div><div class="big" id="tLot">—</div></div>
-        </div>
-        <ul class="break" id="break"></ul>
-        <h3>Material (optional)</h3>
-        <div class="grid2">
-          <label>Zuschnitt L × B <input name="blank" placeholder="420 × 180 mm"></label>
-          <label>Gewicht grob <input name="weight" placeholder="4,2 kg"></label>
-        </div>
-        <label>Bestellhinweis <input name="orderHint" placeholder="Tafel / Streifen / Restlager"></label>
-      </section>
-      <div class="actions">
-        <button class="btn primary" type="submit">Speichern</button>
-        <button class="btn ghost" type="button" id="btnPrint">Drucken</button>
-      </div>
-    </form>
-  </main>
-  <main id="settings" class="hidden">
-    <section class="card">
-      <h2>Eure Zeiten — hier eintragen</h2>
-      <p class="muted">Laserhand steht auf 8 mm/s. MAG und WIG sind Startwerte.</p>
-      <div id="params"></div>
-      <div class="actions">
-        <button class="btn primary" id="btnSaveSet">Speichern</button>
-        <button class="btn ghost" id="btnReset">Standard</button>
-      </div>
-    </section>
-  </main>
-  <dialog id="dlg">
-    <form method="dialog">
-      <h3>Prozess</h3>
-      <label>Art <select id="ptype"></select></label>
-      <div id="pfields"></div>
-      <div class="actions">
-        <button class="btn ghost" value="cancel">Abbrechen</button>
-        <button class="btn primary" id="pok" value="ok">Übernehmen</button>
-      </div>
-    </form>
-  </dialog>
+<header>
+<button type="button" class="icon" id="btnBack" hidden>Zurueck</button>
+<div class="logo">WK</div>
+<div class="brand"><strong>WerkstattKalk</strong><small>Zeit- und Kostenangebot</small></div>
+<button type="button" class="icon" id="btnSettings">Einst.</button>
+</header>
+<main id="home">
+<p class="eyebrow">Testversion</p>
+<h1>Teil antippen oder neu anlegen.</h1>
+<p class="lede">Beispielteile sind schon drin. Stundensaetze stellst du oben rechts unter Einst. ein.</p>
+<div class="actions">
+<button type="button" class="btn primary" id="btnNew">Neues Teil</button>
+<button type="button" class="btn ghost" id="btnDemo">Beispiele laden</button>
+</div>
+<section class="card">
+<div class="row"><h2>Kalkulationen</h2><button type="button" class="link" id="btnClear">Leeren</button></div>
+<div id="list"></div>
+</section>
+</main>
+<main id="part" class="hidden">
+<form id="form">
+<section class="card">
+<h2>Teil</h2>
+<label>Bezeichnung <input name="name" required placeholder="z.B. Konsolblech"></label>
+<div class="grid2">
+<label>Zeichnungsnr. <input name="drawingNo"></label>
+<label>Stueckzahl <input name="qty" type="number" min="1" value="1"></label>
+</div>
+<div class="grid2">
+<label>Werkstoff <input name="material"></label>
+<label>Dicke <input name="thickness"></label>
+</div>
+<label>Notiz <textarea name="note" rows="2"></textarea></label>
+</section>
+<section class="card">
+<div class="row"><h2>Prozesse</h2><button type="button" class="btn ghost" id="btnAdd">Prozess dazu</button></div>
+<p class="hint">Jeder Schritt hat Zeit und Kosten aus eurem Stundensatz.</p>
+<div id="procs"></div>
+</section>
+<section class="card">
+<h2>Angebot</h2>
+<div class="grid2">
+<div><div class="muted">Zeit je Stueck</div><div class="big" id="tEach">-</div></div>
+<div><div class="muted">Zeit Los</div><div class="big" id="tLot">-</div></div>
+<div><div class="muted">Kosten je Stueck</div><div class="big" id="cEach">-</div></div>
+<div><div class="muted">Angebot Los</div><div class="big" id="cLot">-</div></div>
+</div>
+<ul class="break" id="break"></ul>
+<h3>Material optional</h3>
+<div class="grid2">
+<label>Zuschnitt L x B <input name="blank"></label>
+<label>Gewicht grob <input name="weight"></label>
+</div>
+<label>Bestellhinweis <input name="orderHint"></label>
+</section>
+<div class="actions">
+<button class="btn primary" type="submit">Speichern</button>
+<button class="btn ghost" type="button" id="btnPrint">Drucken</button>
+</div>
+</form>
+</main>
+<main id="settings" class="hidden">
+<section class="card">
+<h2>Zeiten und Stundensaetze</h2>
+<p class="hint">Pro Bearbeitungsschritt Geschwindigkeit, Ruestzeit und Euro je Stunde eintragen.</p>
+<div id="params"></div>
+<div class="actions">
+<button type="button" class="btn primary" id="btnSaveSet">Einstellungen speichern</button>
+<button type="button" class="btn ghost" id="btnReset">Standard</button>
+</div>
+</section>
+</main>
+<dialog id="dlg">
+<form method="dialog">
+<h3>Prozess</h3>
+<label>Art <select id="ptype"></select></label>
+<div id="pfields"></div>
+<div class="actions">
+<button type="submit" class="btn ghost" value="cancel">Abbrechen</button>
+<button type="button" class="btn primary" id="pok">Uebernehmen</button>
+</div>
+</form>
+</dialog>
 <script>
-const DEF = {
-  laserhand: { label: "Laserhandschweißen", speedMmPerSec: 8, setupMin: 8, extraPercent: 15 },
-  mag: { label: "MAG", speedMmPerSec: 4, setupMin: 12, extraPercent: 25 },
-  wig: { label: "WIG", speedMmPerSec: 2, setupMin: 15, extraPercent: 30 },
-  laser_cut: { label: "Laserschneiden", speedMmPerSec: 20, pierceSec: 1.5, setupMin: 6, extraPercent: 10 },
-  bend: { label: "Abkanten", secPerBend: 25, setupMin: 10, extraPercent: 10 },
-  mill: { label: "Fräsen", runMin: 15, setupMin: 20, extraPercent: 10 }
+(function(){
+var DEF={
+ laserhand:{label:"Laserhandschweissen",speedMmPerSec:8,setupMin:8,extraPercent:15,euroPerHour:75},
+ mag:{label:"MAG",speedMmPerSec:4,setupMin:12,extraPercent:25,euroPerHour:75},
+ wig:{label:"WIG",speedMmPerSec:2,setupMin:15,extraPercent:30,euroPerHour:85},
+ laser_cut:{label:"Laserschneiden",speedMmPerSec:20,pierceSec:1.5,setupMin:6,extraPercent:10,euroPerHour:95},
+ bend:{label:"Abkanten",secPerBend:25,setupMin:10,extraPercent:10,euroPerHour:70},
+ mill:{label:"Fraesen",runMin:15,setupMin:20,extraPercent:10,euroPerHour:80}
 };
-const TYPES = Object.keys(DEF);
-const DEMOS = [
-  { id:"demo-1", name:"Konsolblech Drehgestell", drawingNo:"SF-8841-A", qty:8, material:"S355", thickness:"8 mm", note:"Beispiel CL1 MAG + Laser + 4 Kanten", blank:"420 x 180 mm", weight:"4,7 kg", orderHint:"Tafel 8 mm S355", processes:[{type:"laser_cut",lengthMm:1400,pierces:6},{type:"bend",bends:4},{type:"mag",lengthMm:620}] },
-  { id:"demo-2", name:"Halter Edelstahl Innenraum", drawingNo:"SF-2190", qty:2, material:"1.4301", thickness:"3 mm", note:"Beispiel WIG sichtbar", blank:"250 x 80 mm", weight:"0,5 kg", orderHint:"Edelstahlblech 3 mm", processes:[{type:"laser_cut",lengthMm:720,pierces:3},{type:"bend",bends:2},{type:"wig",lengthMm:180}] },
-  { id:"demo-3", name:"Anschweisslasche + Fraesung", drawingNo:"SF-4412", qty:1, material:"S355", thickness:"12 mm", note:"Beispiel Laserhand 8 mm/s + Fraesen", blank:"160 x 90 mm", weight:"1,3 kg", orderHint:"Flachstahl 12 mm", processes:[{type:"laserhand",lengthMm:240},{type:"mill",runMin:18,setupMin:20}] }
+var TYPES=Object.keys(DEF);
+var DEMOS=[
+ {id:"demo-1",name:"Konsolblech Drehgestell",drawingNo:"SF-8841-A",qty:8,material:"S355",thickness:"8 mm",note:"Beispiel MAG + Laser + Kanten",blank:"420 x 180 mm",weight:"4,7 kg",orderHint:"Tafel 8 mm S355",processes:[{type:"laser_cut",lengthMm:1400,pierces:6},{type:"bend",bends:4},{type:"mag",lengthMm:620}]},
+ {id:"demo-2",name:"Halter Edelstahl Innenraum",drawingNo:"SF-2190",qty:2,material:"1.4301",thickness:"3 mm",note:"Beispiel WIG",blank:"250 x 80 mm",weight:"0,5 kg",orderHint:"Edelstahl 3 mm",processes:[{type:"laser_cut",lengthMm:720,pierces:3},{type:"bend",bends:2},{type:"wig",lengthMm:180}]},
+ {id:"demo-3",name:"Anschweisslasche + Fraesung",drawingNo:"SF-4412",qty:1,material:"S355",thickness:"12 mm",note:"Laserhand + Fraesen",blank:"160 x 90 mm",weight:"1,3 kg",orderHint:"Flachstahl 12 mm",processes:[{type:"laserhand",lengthMm:240},{type:"mill",runMin:18,setupMin:20}]}
 ];
-function loadParams(){ try { return Object.assign(JSON.parse(JSON.stringify(DEF)), JSON.parse(localStorage.getItem("wk_params")||"{}")); } catch(e){ return JSON.parse(JSON.stringify(DEF)); } }
-function saveParams(p){ localStorage.setItem("wk_params", JSON.stringify(p)); }
-function loadHist(){ try { return JSON.parse(localStorage.getItem("wk_history")||"[]"); } catch(e){ return []; } }
-function saveHist(l){ localStorage.setItem("wk_history", JSON.stringify(l.slice(0,80))); }
-function fmt(min){ if(!isFinite(min)) return "-"; const t=Math.round(min), h=Math.floor(t/60), m=t%60; return h? (h+" h "+String(m).padStart(2,"0")+" min") : (m+" min"); }
-function extra(min,pct){ return min*(1+(Number(pct)||0)/100); }
+function loadParams(){var out=JSON.parse(JSON.stringify(DEF));try{var saved=JSON.parse(localStorage.getItem("wk_params")||"{}");TYPES.forEach(function(k){if(saved[k])Object.assign(out[k],saved[k]);});}catch(e){}return out;}
+function saveParams(p){localStorage.setItem("wk_params",JSON.stringify(p));}
+function loadHist(){try{return JSON.parse(localStorage.getItem("wk_history")||"[]");}catch(e){return [];}}
+function saveHist(l){localStorage.setItem("wk_history",JSON.stringify(l.slice(0,80)));}
+function fmtMin(min){if(!isFinite(min))return "-";var t=Math.round(min),h=Math.floor(t/60),m=t%60;return h?(h+" h "+(m<10?"0":"")+m+" min"):(m+" min");}
+function fmtEuro(n){if(!isFinite(n))return "-";return n.toFixed(2).replace(".",",")+" EUR";}
+function extra(min,pct){return min*(1+(Number(pct)||0)/100);}
+function costFromMin(min,rate){return (Number(min)||0)/60*(Number(rate)||0);}
 function calcProc(proc,P,qty){
-  const p=P[proc.type]||{}; let each=0, setup=Number(p.setupMin)||0;
-  if(["laserhand","mag","wig"].indexOf(proc.type)>=0){ each=extra(((Number(proc.lengthMm)||0)/(Number(p.speedMmPerSec)||1))/60, p.extraPercent); }
-  else if(proc.type==="laser_cut"){ const cut=((Number(proc.lengthMm)||0)/(Number(p.speedMmPerSec)||1))/60; const pierce=((Number(proc.pierces)||0)*(Number(p.pierceSec)||0))/60; each=extra(cut+pierce,p.extraPercent); }
-  else if(proc.type==="bend"){ each=extra(((Number(proc.bends)||0)*(Number(p.secPerBend)||0))/60, p.extraPercent); }
-  else if(proc.type==="mill"){ each=extra(Number(proc.runMin!=null?proc.runMin:p.runMin)||0, p.extraPercent); setup=Number(proc.setupMin!=null?proc.setupMin:p.setupMin)||0; }
-  return {setup:setup,each:each,lot:setup+each*(Number(qty)||1),label:p.label||proc.type};
+ var p=P[proc.type]||{},each=0,setup=Number(p.setupMin)||0,rate=Number(p.euroPerHour)||0;
+ if(proc.type==="laserhand"||proc.type==="mag"||proc.type==="wig"){each=extra(((Number(proc.lengthMm)||0)/(Number(p.speedMmPerSec)||1))/60,p.extraPercent);}
+ else if(proc.type==="laser_cut"){var cut=((Number(proc.lengthMm)||0)/(Number(p.speedMmPerSec)||1))/60;var pierce=((Number(proc.pierces)||0)*(Number(p.pierceSec)||0))/60;each=extra(cut+pierce,p.extraPercent);}
+ else if(proc.type==="bend"){each=extra(((Number(proc.bends)||0)*(Number(p.secPerBend)||0))/60,p.extraPercent);}
+ else if(proc.type==="mill"){each=extra(Number(proc.runMin!=null?proc.runMin:p.runMin)||0,p.extraPercent);setup=Number(proc.setupMin!=null?proc.setupMin:p.setupMin)||0;}
+ var costEach=costFromMin(each,rate),costSetup=costFromMin(setup,rate);
+ return {setup:setup,each:each,costEach:costEach,costSetup:costSetup,costLot:costSetup+costEach*(Number(qty)||1),label:p.label||proc.type,rate:rate};
 }
-function calcJob(job,P){ const qty=Number(job.qty)||1; const rows=(job.processes||[]).map(function(pr){ const r=calcProc(pr,P,qty); return Object.assign({},pr,r); }); const setup=rows.reduce(function(s,r){return s+r.setup;},0); const each=rows.reduce(function(s,r){return s+r.each;},0); return {rows:rows,setup:setup,each:each,lot:setup+each*qty,qty:qty}; }
-const state={job:null,params:loadParams(),edit:null};
-function $(id){ return document.getElementById(id); }
-function show(name){ ["home","part","settings"].forEach(function(id){ $(id).classList.toggle("hidden", id!==name); }); $("btnBack").hidden = name==="home"; }
-function ensureDemos(){ if(!loadHist().length) saveHist(DEMOS); }
-function esc(s){ return String(s||"").replace(/[&<>"]/g, function(c){ return ({"&":"&","<":"<",">":">","\"":"""})[c]; }); }
-function renderList(){ const list=loadHist(); $("list").innerHTML = list.length ? list.map(function(j){ const t=calcJob(j,state.params); return '<article class="item" data-id="'+j.id+'"><div><strong>'+esc(j.name)+'</strong><div class="muted">'+esc(j.drawingNo||"-")+' · '+(j.qty||1)+' Stk.</div></div><div class="ok">'+fmt(t.lot)+'</div></article>'; }).join("") : '<p class="muted">Keine Teile.</p>'; }
-function emptyJob(){ return {id:crypto.randomUUID(),name:"",drawingNo:"",qty:1,material:"",thickness:"",note:"",blank:"",weight:"",orderHint:"",processes:[]}; }
-function fill(job){ const f=$("form"); ["name","drawingNo","qty","material","thickness","note","blank","weight","orderHint"].forEach(function(k){ f[k].value=job[k]||""; }); renderProcs(); renderResult(); }
-function read(){ const f=$("form"); ["name","drawingNo","material","thickness","note","blank","weight","orderHint"].forEach(function(k){ state.job[k]=f[k].value.trim(); }); state.job.qty=Number(f.qty.value)||1; }
-function sum(p){ if(["laserhand","mag","wig"].indexOf(p.type)>=0) return (p.lengthMm||0)+" mm Naht"; if(p.type==="laser_cut") return (p.lengthMm||0)+" mm Schnitt · "+(p.pierces||0)+" Einstiche"; if(p.type==="bend") return (p.bends||0)+" Kantungen"; if(p.type==="mill") return (p.runMin||0)+" min Laufzeit"; return ""; }
-function renderProcs(){ const box=$("procs"); if(!state.job.processes.length){ box.innerHTML='<p class="muted">Noch kein Prozess.</p>'; return; } box.innerHTML=state.job.processes.map(function(p,i){ const r=calcProc(p,state.params,state.job.qty||1); return '<article class="proc" data-i="'+i+'"><div><strong>'+esc(r.label)+'</strong><div class="muted">'+sum(p)+'</div></div><div><div class="ok">'+fmt(r.each)+' / Stk.</div><button type="button" class="link e">Aendern</button> <button type="button" class="link d">Loeschen</button></div></article>'; }).join(""); }
-function renderResult(){ if(!state.job) return; read(); const t=calcJob(state.job,state.params); $("tEach").textContent=fmt(t.each); $("tLot").textContent=fmt(t.lot); $("break").innerHTML=t.rows.map(function(r){ return '<li><span>'+esc(r.label)+' <small class="muted">Ruest '+fmt(r.setup)+'</small></span><span>'+fmt(r.each)+'</span></li>'; }).join(""); }
-function fields(type,p){ p=p||{}; if(["laserhand","mag","wig"].indexOf(type)>=0) return '<label>Nahtlaenge mm <input id="fl" type="number" min="0" value="'+(p.lengthMm||"")+'"></label>'; if(type==="laser_cut") return '<label>Schnittlaenge mm <input id="fl" type="number" min="0" value="'+(p.lengthMm||"")+'"></label><label>Einstiche <input id="fp" type="number" min="0" value="'+(p.pierces||0)+'"></label>'; if(type==="bend") return '<label>Anzahl Kantungen <input id="fb" type="number" min="0" value="'+(p.bends||"")+'"></label>'; if(type==="mill") return '<label>Laufzeit min <input id="fr" type="number" min="0" step="0.5" value="'+(p.runMin||state.params.mill.runMin)+'"></label><label>Ruestzeit min <input id="fs" type="number" min="0" step="0.5" value="'+(p.setupMin||state.params.mill.setupMin)+'"></label>'; return ""; }
-function openDlg(i){ state.edit=(i==null?null:i); $("ptype").innerHTML=TYPES.map(function(t){ return '<option value="'+t+'">'+state.params[t].label+'</option>'; }).join(""); const ex=(i!=null)?state.job.processes[i]:{}; if(ex&&ex.type) $("ptype").value=ex.type; $("pfields").innerHTML=fields($("ptype").value,ex||{}); $("dlg").showModal(); }
-function renderParams(){ $("params").innerHTML=TYPES.map(function(k){ const p=state.params[k]; const a=k==="bend"?"secPerBend":k==="mill"?"runMin":"speedMmPerSec"; const al=k==="bend"?"Sek. / Kante":k==="mill"?"Laufzeit min":"mm / Sekunde"; return '<div class="card" style="margin:8px 0;padding:12px"><strong>'+p.label+'</strong><div class="grid2"><label>'+al+'<input data-k="'+k+'" data-f="'+a+'" type="number" step="0.1" value="'+(p[a]||"")+'"></label><label>Ruestzeit min<input data-k="'+k+'" data-f="setupMin" type="number" step="0.5" value="'+p.setupMin+'"></label><label>Zuschlag %<input data-k="'+k+'" data-f="extraPercent" type="number" value="'+p.extraPercent+'"></label>'+(k==="laser_cut"?'<label>Einstechzeit s<input data-k="'+k+'" data-f="pierceSec" type="number" step="0.1" value="'+p.pierceSec+'"></label>':'')+'</div></div>'; }).join(""); }
-$("btnNew").onclick=function(){ state.job=emptyJob(); fill(state.job); show("part"); };
-$("btnBack").onclick=function(){ show("home"); renderList(); };
-$("btnSettings").onclick=function(){ renderParams(); show("settings"); };
-$("btnAdd").onclick=function(){ openDlg(null); };
-$("ptype").onchange=function(){ const ex=state.edit!=null?state.job.processes[state.edit]:{}; $("pfields").innerHTML=fields($("ptype").value,ex||{}); };
-$("pok").onclick=function(e){ e.preventDefault(); const type=$("ptype").value; const proc={type:type}; if(["laserhand","mag","wig","laser_cut"].indexOf(type)>=0) proc.lengthMm=Number(($("fl")||{}).value)||0; if(type==="laser_cut") proc.pierces=Number(($("fp")||{}).value)||0; if(type==="bend") proc.bends=Number(($("fb")||{}).value)||0; if(type==="mill"){ proc.runMin=Number(($("fr")||{}).value)||0; proc.setupMin=Number(($("fs")||{}).value)||0; } if(state.edit!=null) state.job.processes[state.edit]=proc; else state.job.processes.push(proc); $("dlg").close(); renderProcs(); renderResult(); };
-$("procs").onclick=function(e){ const card=e.target.closest(".proc"); if(!card) return; const i=Number(card.dataset.i); if(e.target.classList.contains("d")){ state.job.processes.splice(i,1); renderProcs(); renderResult(); } if(e.target.classList.contains("e")) openDlg(i); };
-$("form").oninput=renderResult;
-$("form").onsubmit=function(e){ e.preventDefault(); read(); if(!state.job.name) return alert("Bitte Bezeichnung angeben."); const list=loadHist().filter(function(j){ return j.id!==state.job.id; }); list.unshift(Object.assign({},state.job)); saveHist(list); show("home"); renderList(); };
-$("list").onclick=function(e){ const it=e.target.closest(".item"); if(!it) return; const job=loadHist().filter(function(j){ return j.id===it.dataset.id; })[0]; if(!job) return; state.job=JSON.parse(JSON.stringify(job)); fill(state.job); show("part"); };
-$("btnClear").onclick=function(){ if(confirm("Liste leeren?")){ saveHist([]); renderList(); } };
-$("btnDemo").onclick=function(){ saveHist(DEMOS); renderList(); };
-$("btnPrint").onclick=function(){ read(); window.print(); };
-$("btnSaveSet").onclick=function(){ document.querySelectorAll("#params input").forEach(function(inp){ if(inp.dataset.k&&inp.dataset.f) state.params[inp.dataset.k][inp.dataset.f]=Number(inp.value); }); saveParams(state.params); alert("Gespeichert."); show("home"); renderList(); };
-$("btnReset").onclick=function(){ state.params=JSON.parse(JSON.stringify(DEF)); saveParams(state.params); renderParams(); };
-ensureDemos(); renderList();
+function calcJob(job,P){var qty=Number(job.qty)||1;var rows=(job.processes||[]).map(function(pr){return Object.assign({},pr,calcProc(pr,P,qty));});var setup=0,each=0,costSetup=0,costEach=0;rows.forEach(function(r){setup+=r.setup;each+=r.each;costSetup+=r.costSetup;costEach+=r.costEach;});return {rows:rows,setup:setup,each:each,lot:setup+each*qty,costEach:costEach,costLot:costSetup+costEach*qty,qty:qty};}
+var state={job:null,params:loadParams(),edit:null};
+function $(id){return document.getElementById(id);}
+function show(name){["home","part","settings"].forEach(function(id){$(id).classList.toggle("hidden",id!==name);});$("btnBack").hidden=name==="home";}
+function esc(s){return String(s||"").split("&").join("&amp;").split("<").join("&lt;").split(">").join("&gt;");}
+function ensureDemos(){if(!loadHist().length)saveHist(DEMOS);}
+function renderList(){var list=loadHist();if(!list.length){$("list").innerHTML='<p class="muted">Keine Teile.</p>';return;}$("list").innerHTML=list.map(function(j){var t=calcJob(j,state.params);return '<article class="item" data-id="'+j.id+'"><div><strong>'+esc(j.name)+'</strong><div class="muted">'+esc(j.drawingNo||"-")+' · '+(j.qty||1)+' Stk.</div></div><div class="ok">'+fmtMin(t.lot)+'<br>'+fmtEuro(t.costLot)+'</div></article>';}).join("");}
+function emptyJob(){return {id:(crypto.randomUUID?crypto.randomUUID():String(Date.now())),name:"",drawingNo:"",qty:1,material:"",thickness:"",note:"",blank:"",weight:"",orderHint:"",processes:[]};}
+function fill(job){var f=$("form");["name","drawingNo","qty","material","thickness","note","blank","weight","orderHint"].forEach(function(k){f[k].value=job[k]||"";});renderProcs();renderResult();}
+function read(){var f=$("form");["name","drawingNo","material","thickness","note","blank","weight","orderHint"].forEach(function(k){state.job[k]=f[k].value.trim();});state.job.qty=Number(f.qty.value)||1;}
+function sum(p){if(p.type==="laserhand"||p.type==="mag"||p.type==="wig")return (p.lengthMm||0)+" mm Naht";if(p.type==="laser_cut")return (p.lengthMm||0)+" mm Schnitt · "+(p.pierces||0)+" Einstiche";if(p.type==="bend")return (p.bends||0)+" Kantungen";if(p.type==="mill")return (p.runMin||0)+" min Laufzeit";return "";}
+function renderProcs(){var box=$("procs");if(!state.job.processes.length){box.innerHTML='<p class="muted">Noch kein Prozess.</p>';return;}box.innerHTML=state.job.processes.map(function(p,i){var r=calcProc(p,state.params,state.job.qty||1);return '<article class="proc" data-i="'+i+'"><div><strong>'+esc(r.label)+'</strong><div class="muted">'+sum(p)+'</div></div><div class="ok">'+fmtMin(r.each)+'<br>'+fmtEuro(r.costEach)+'</div></article>';}).join("");}
+function renderResult(){if(!state.job)return;read();var t=calcJob(state.job,state.params);$("tEach").textContent=fmtMin(t.each);$("tLot").textContent=fmtMin(t.lot);$("cEach").textContent=fmtEuro(t.costEach);$("cLot").textContent=fmtEuro(t.costLot);$("break").innerHTML=t.rows.map(function(r){return '<li><span>'+esc(r.label)+'<br><small class="muted">Ruest '+fmtMin(r.setup)+' · '+r.rate+' EUR/h</small></span><span>'+fmtMin(r.each)+'<br>'+fmtEuro(r.costEach)+'</span></li>';}).join("");}
+function fields(type,p){p=p||{};if(type==="laserhand"||type==="mag"||type==="wig")return '<label>Nahtlaenge mm <input id="fl" type="number" min="0" value="'+(p.lengthMm||"")+'"></label>';if(type==="laser_cut")return '<label>Schnittlaenge mm <input id="fl" type="number" min="0" value="'+(p.lengthMm||"")+'"></label><label>Einstiche <input id="fp" type="number" min="0" value="'+(p.pierces||0)+'"></label>';if(type==="bend")return '<label>Anzahl Kantungen <input id="fb" type="number" min="0" value="'+(p.bends||"")+'"></label>';if(type==="mill")return '<label>Laufzeit min <input id="fr" type="number" min="0" step="0.5" value="'+(p.runMin||state.params.mill.runMin)+'"></label><label>Ruestzeit min <input id="fs" type="number" min="0" step="0.5" value="'+(p.setupMin||state.params.mill.setupMin)+'"></label>';return "";}
+function openDlg(i){state.edit=(i==null?null:i);$("ptype").innerHTML=TYPES.map(function(t){return '<option value="'+t+'">'+state.params[t].label+'</option>';}).join("");var ex=(i!=null)?state.job.processes[i]:{};if(ex&&ex.type)$("ptype").value=ex.type;$("pfields").innerHTML=fields($("ptype").value,ex||{});$("dlg").showModal();}
+function renderParams(){$("params").innerHTML=TYPES.map(function(k){var p=state.params[k];var a=k==="bend"?"secPerBend":k==="mill"?"runMin":"speedMmPerSec";var al=k==="bend"?"Sek. / Kante":k==="mill"?"Laufzeit min":"mm / Sekunde";var pierce=k==="laser_cut"?'<label>Einstechzeit s<input data-k="'+k+'" data-f="pierceSec" type="number" step="0.1" value="'+p.pierceSec+'"></label>':"";return '<div class="card" style="margin:8px 0;padding:12px"><strong>'+p.label+'</strong><div class="grid2"><label>'+al+'<input data-k="'+k+'" data-f="'+a+'" type="number" step="0.1" value="'+(p[a]||"")+'"></label><label>Ruestzeit min<input data-k="'+k+'" data-f="setupMin" type="number" step="0.5" value="'+p.setupMin+'"></label><label>Zuschlag %<input data-k="'+k+'" data-f="extraPercent" type="number" value="'+p.extraPercent+'"></label><label>Stundensatz EUR<input data-k="'+k+'" data-f="euroPerHour" type="number" step="0.5" value="'+(p.euroPerHour||0)+'"></label>'+pierce+'</div></div>';}).join("");}
+$("btnNew").addEventListener("click",function(){state.job=emptyJob();fill(state.job);show("part");});
+$("btnBack").addEventListener("click",function(){show("home");renderList();});
+$("btnSettings").addEventListener("click",function(){renderParams();show("settings");});
+$("btnAdd").addEventListener("click",function(){openDlg(null);});
+$("ptype").addEventListener("change",function(){var ex=state.edit!=null?state.job.processes[state.edit]:{};$("pfields").innerHTML=fields($("ptype").value,ex||{});});
+$("pok").addEventListener("click",function(){var type=$("ptype").value;var proc={type:type};if(type==="laserhand"||type==="mag"||type==="wig"||type==="laser_cut")proc.lengthMm=Number(($("fl")||{}).value)||0;if(type==="laser_cut")proc.pierces=Number(($("fp")||{}).value)||0;if(type==="bend")proc.bends=Number(($("fb")||{}).value)||0;if(type==="mill"){proc.runMin=Number(($("fr")||{}).value)||0;proc.setupMin=Number(($("fs")||{}).value)||0;}if(state.edit!=null)state.job.processes[state.edit]=proc;else state.job.processes.push(proc);$("dlg").close();renderProcs();renderResult();});
+$("procs").addEventListener("click",function(e){var card=e.target.closest(".proc");if(!card)return;openDlg(Number(card.dataset.i));});
+$("form").addEventListener("input",renderResult);
+$("form").addEventListener("submit",function(e){e.preventDefault();read();if(!state.job.name){alert("Bitte Bezeichnung angeben.");return;}var t=calcJob(state.job,state.params);state.job.savedTimeLot=t.lot;state.job.savedCostLot=t.costLot;var list=loadHist().filter(function(j){return j.id!==state.job.id;});list.unshift(JSON.parse(JSON.stringify(state.job)));saveHist(list);show("home");renderList();});
+$("list").addEventListener("click",function(e){var it=e.target.closest(".item");if(!it)return;var job=loadHist().filter(function(j){return j.id===it.dataset.id;})[0];if(!job)return;state.job=JSON.parse(JSON.stringify(job));fill(state.job);show("part");});
+$("btnClear").addEventListener("click",function(){if(confirm("Liste leeren?")){saveHist([]);renderList();}});
+$("btnDemo").addEventListener("click",function(){saveHist(DEMOS);renderList();});
+$("btnPrint").addEventListener("click",function(){read();window.print();});
+$("btnSaveSet").addEventListener("click",function(){document.querySelectorAll("#params input").forEach(function(inp){if(inp.dataset.k&&inp.dataset.f)state.params[inp.dataset.k][inp.dataset.f]=Number(inp.value);});saveParams(state.params);alert("Einstellungen gespeichert.");show("home");renderList();});
+$("btnReset").addEventListener("click",function(){state.params=JSON.parse(JSON.stringify(DEF));saveParams(state.params);renderParams();});
+ensureDemos();renderList();
+})();
 </script>
 </body>
 </html>
