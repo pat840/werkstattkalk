@@ -31,20 +31,18 @@ input,select,textarea{background:var(--bg);color:var(--text);border:1px solid va
 dialog{border:1px solid var(--line);border-radius:16px;background:var(--bg2);color:var(--text);width:min(92vw,440px);padding:16px}
 .thumbs{display:flex;flex-wrap:wrap;gap:8px}
 .thumbs img,.filechip,.clogo{width:72px;height:72px;object-fit:contain;border-radius:8px;border:1px solid var(--line);background:#fff}
-.filechip{display:grid;place-items:center;font-size:11px;text-align:center;padding:6px;color:#111}
-.clogo{width:40px;height:40px;border-radius:8px}
+.clogo{width:40px;height:40px}
 .check{flex-direction:row;align-items:center;gap:8px}.check input{min-height:auto;width:18px}
 #sheet{display:none}
 @media print{
  header,.no-print,dialog,#home,#cust,#part,#settings{display:none!important}
  body{background:#fff;color:#111}
- #sheet{display:block!important;max-width:100%;padding:0;margin:0}
+ #sheet{display:block!important}
  #sheet .head{display:flex;align-items:center;gap:12px;border-bottom:2px solid #111;padding-bottom:10px;margin-bottom:14px}
  #sheet img.shop{height:48px}
- #sheet h1{font-size:20px;margin:0}
  #sheet table{width:100%;border-collapse:collapse}
  #sheet th,#sheet td{border:1px solid #ccc;padding:6px 8px;font-size:12px}
- #sheet th{background:#eee;text-align:left}
+ #sheet th{background:#eee}
  #sheet td.r,#sheet th.r{text-align:right}
 }
 </style>
@@ -128,8 +126,8 @@ dialog{border:1px solid var(--line);border-radius:16px;background:var(--bg2);col
 <main id="settings" class="hidden">
 <section class="card">
 <h2>Euer Firmenkopf (Druck)</h2>
-<label>Firmenname <input id="shopName" placeholder="Eure Firma GmbH"></label>
-<label>Adresse / Zeile 2 <input id="shopAddr" placeholder="Strasse, Ort"></label>
+<label>Firmenname <input id="shopName"></label>
+<label>Adresse / Zeile 2 <input id="shopAddr"></label>
 <label>Logo der eigenen Firma <input type="file" id="shopLogo" accept="image/*"></label>
 <div id="shopPreview"></div>
 </section>
@@ -139,21 +137,9 @@ dialog{border:1px solid var(--line);border-radius:16px;background:var(--bg2);col
 <label>Aufschlag % <input id="markupPct" type="number" value="0"></label>
 </section>
 <section class="card"><h2>Stundensaetze</h2><div id="params"></div></section>
-<div class="actions">
-<button type="button" class="btn primary" id="btnSaveSet">Speichern</button>
-</div>
+<div class="actions"><button type="button" class="btn primary" id="btnSaveSet">Speichern</button></div>
 </main>
 <div id="sheet"></div>
-<dialog id="dlg">
-<form method="dialog">
-<h3 id="dlgTitle">Eintrag</h3>
-<div id="dlgBody"></div>
-<div class="actions">
-<button type="submit" class="btn ghost" value="cancel">Abbrechen</button>
-<button type="button" class="btn primary" id="pok">OK</button>
-</div>
-</form>
-</dialog>
-<script src="https://raw.githack.com/pat840/werkstattkalk/main/app.js"></script>
-</body>
-</html>
+<dialog id="dlg"><form method="dialog"><h3 id="dlgTitle">Eintrag</h3><div id="dlgBody"></div><div class="actions"><button type="submit" class="btn ghost" value="cancel">Abbrechen</button><button type="button" class="btn primary" id="pok">OK</button></div></form></dialog>
+<script src="https://cdn.jsdelivr.net/gh/pat840/werkstattkalk@53147d7d7484baedc81b87d95f996eee65d173d1/app.js"></script>
+</body></html>
