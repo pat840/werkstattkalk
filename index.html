@@ -1,2 +1,139 @@
 <!DOCTYPE html>
-<html lang="de"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>WerkstattKalk</title></head><body><p>WerkstattKalk</p><p><a href="https://htmlpreview.github.io/?https://raw.githubusercontent.com/pat840/werkstattkalk/553a427104f9c0081bf884d8d808dba0ffc8e8c3/index.html">App oeffnen</a></p></body></html>
+<html lang="de"><head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>WerkstattKalk</title>
+<style>
+:root{--bg:#121821;--card:#222c3d;--line:#334058;--txt:#eef3f8;--mu:#9aa8b8;--ac:#e8a23a;--ok:#3ecf8e}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,sans-serif;background:var(--bg);color:var(--txt)}
+header{position:sticky;top:0;z-index:5;display:flex;gap:8px;align-items:center;padding:10px 12px;background:#1a2332;border-bottom:1px solid var(--line)}
+.logo{width:36px;height:36px;border-radius:10px;background:var(--ac);color:#1a1408;display:grid;place-items:center;font-weight:800}
+.brand{flex:1}.brand small{display:block;color:var(--mu);font-size:12px}
+button{font:inherit;cursor:pointer}
+.icon{min-width:44px;min-height:44px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--txt)}
+main{max-width:760px;margin:0 auto;padding:14px 14px 48px}
+h1{font-size:1.28rem;margin:.2rem 0 .5rem}h2{margin:0 0 8px;font-size:1.05rem}
+.ey{color:var(--ac);font-size:12px;font-weight:700;text-transform:uppercase}
+.mu{color:var(--mu);font-size:13px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px;margin:10px 0}
+label{display:flex;flex-direction:column;gap:5px;font-size:13px;color:var(--mu);margin:8px 0}
+input,select,textarea{background:#121821;color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit;min-height:44px}
+input[readonly]{background:#1a2332;color:var(--ok);font-weight:800}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:640px){.g2{grid-template-columns:1fr}}
+.btn{border:0;border-radius:12px;padding:12px 14px;font-weight:700;min-height:46px}
+.pri{background:var(--ac);color:#1a1408}.gh{background:transparent;color:var(--txt);border:1px solid var(--line)}
+.link{background:0;border:0;color:#7eb0ff;min-height:42px}
+.item{background:#121821;border-radius:12px;padding:11px;margin:7px 0}
+.ok{color:var(--ok);font-weight:700;text-align:right}
+.act{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.hid{display:none!important}
+dialog{border:1px solid var(--line);border-radius:16px;background:#1a2332;color:var(--txt);width:min(94vw,420px);padding:14px}
+.chk{flex-direction:row;align-items:center;gap:8px}.chk input{width:18px;min-height:auto}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{border:1px solid var(--line);background:#121821;color:var(--txt);border-radius:999px;padding:9px 11px;min-height:42px}
+.chip.on{background:var(--ac);color:#1a1408;border-color:var(--ac);font-weight:700}
+.kpi{background:#121821;border-radius:12px;padding:10px}
+#sheet{display:none}
+@media print{header,.np,dialog,main{display:none!important}body{background:#fff;color:#111}#sheet{display:block!important}#sheet table{width:100%;border-collapse:collapse}#sheet td,#sheet th{border:1px solid #ccc;padding:6px;font-size:12px}}
+</style></head><body>
+<header class="np">
+<button type="button" class="icon" id="back" hidden>Zurueck</button>
+<div class="logo">WK</div>
+<div class="brand"><strong id="ht">WerkstattKalk</strong><small id="hs">Kalkulation</small></div>
+<button type="button" class="icon" id="set">Einst.</button>
+</header>
+<main id="home">
+<p class="ey">Suche / Kunden</p>
+<h1>Artikel oder Kunde</h1>
+<label>Artikelnr. / Name<input id="q" placeholder="SF-8841 oder Konsolblech"></label>
+<section class="card hid" id="hits"></section>
+<div class="act">
+<button type="button" class="btn pri" id="nc">Neuer Kunde</button>
+<button type="button" class="btn gh" id="demo">Beispiele</button>
+</div>
+<section class="card" id="clist"></section>
+</main>
+<main id="cust" class="hid">
+<p class="ey" id="ceye">Kunde</p><h1 id="ct">Kunde</h1>
+<div class="act"><button type="button" class="btn pri" id="nq">Neues Angebot</button></div>
+<section class="card" id="qlist"></section>
+</main>
+<main id="part" class="hid">
+<section class="card">
+<h2>Artikel</h2>
+<div class="g2"><label>Angebotsnr.<input id="no"></label><label>Datum<input id="dt" type="date"></label></div>
+<div class="g2"><label>Artikelnr.<input id="zn"></label><label>Stueck Fertigteil<input id="qty" type="number" value="1" min="1"></label></div>
+<label>Bezeichnung<input id="nm"></label>
+</section>
+<section class="card">
+<h2>Tafel</h2>
+<label>Werkstoff<select id="mat"></select></label>
+<label>Materialstaerke<select id="th"></select></label>
+<label>Blechformat<select id="fmt"></select></label>
+<div class="g2 hid" id="free">
+<label>Laenge mm<input id="L" type="number"></label>
+<label>Breite mm<input id="B" type="number"></label>
+</div>
+<div class="g2">
+<label>Tafeln<input id="sh" type="number" value="1" min="1"></label>
+<label>Tafelpreis EUR<input id="tp" type="number" step="0.01"></label>
+</div>
+<label class="chk"><input type="checkbox" id="useT"> Tafelpreis statt kg-Preis</label>
+<div class="kpi">
+<div class="mu">Gewicht je Tafel (nur Rechnung)</div>
+<input id="kg" readonly>
+<div class="mu" id="kgh"></div>
+</div>
+</section>
+<section class="card">
+<h2>Bearbeitungen</h2>
+<p class="mu">Abkanten = Anzahl Kantungen je Stueck.</p>
+<div class="chips" id="chips"></div>
+</section>
+<section class="card"><h2>Mengen</h2><div id="steps"></div></section>
+<section class="card">
+<h2>Zukauf</h2>
+<label>Teil aus Liste<select id="cat"></select></label>
+<div class="g2"><label>Menge<input id="cq" type="number" value="1"></label><label>EUR<input id="cp" type="number" step="0.01"></label></div>
+<div class="act">
+<button type="button" class="btn gh" id="addc">Uebernehmen</button>
+<button type="button" class="btn gh" id="addf">Sonstiges + speichern</button>
+</div>
+<div id="buys"></div>
+</section>
+<section class="card">
+<h2>Summe</h2>
+<div class="g2">
+<div class="kpi"><div class="mu">Nettogesamt</div><div class="ok" id="cN">-</div></div>
+<div class="kpi"><div class="mu">Enthaltene MwSt. (19%)</div><div class="ok" id="cV">-</div></div>
+<div class="kpi"><div class="mu">Brutto</div><div class="ok" id="cG">-</div></div>
+<div class="kpi"><div class="mu">Bearbeitung</div><div class="ok" id="cL">-</div></div>
+<div class="kpi"><div class="mu">Material</div><div class="ok" id="cM">-</div></div>
+<div class="kpi"><div class="mu">Zukauf</div><div class="ok" id="cB">-</div></div>
+</div>
+</section>
+<div class="act np">
+<button type="button" class="btn pri" id="sv">Speichern</button>
+<button type="button" class="btn gh" id="rv">Als /2</button>
+<button type="button" class="btn gh" id="pr">Drucken</button>
+</div>
+</main>
+<main id="setp" class="hid">
+<section class="card"><h2>Firma</h2><label>Name<input id="sn"></label><label>Adresse<input id="sa"></label></section>
+<section class="card">
+<label>Verschnitt %<input id="sc" type="number" value="15"></label>
+<label>Aufschlag %<input id="mk" type="number" value="0"></label>
+<label>Bolzen EUR/Stk<input id="bp" type="number" step="0.01"></label>
+<label>Schweissmutter EUR/Stk<input id="np" type="number" step="0.01"></label>
+<label>Laser Stueckpreis EUR<input id="lp" type="number" step="0.01"></label>
+</section>
+<section class="card"><h2>EUR/h</h2><div id="rates"></div></section>
+<section class="card"><h2>EUR/kg</h2><div id="med"></div></section>
+<div class="act"><button type="button" class="btn pri" id="ss">Speichern</button></div>
+</main>
+<div id="sheet"></div>
+<dialog id="dlg"><h3 id="dtl"></h3><div id="db"></div>
+<div class="act"><button type="button" class="btn gh" id="dx">Abbrechen</button><button type="button" class="btn pri" id="dok">OK</button></div>
+</dialog>
+<script src="https://cdn.jsdelivr.net/gh/pat840/werkstattkalk@main/app.js?v=20260904c"></script>
+</body></html>
