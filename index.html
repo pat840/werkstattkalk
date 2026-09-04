@@ -1,1 +1,115 @@
-PLACEHOLDER
+<!DOCTYPE html>
+<html lang="de"><head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>WerkstattKalk</title>
+<style>
+body{font-family:system-ui;background:#121821;color:#eef3f8;margin:0}
+header{display:flex;gap:8px;align-items:center;padding:12px;background:#1a2332}
+.logo{width:36px;height:36px;border-radius:10px;background:#e8a23a;color:#1a1408;display:grid;place-items:center;font-weight:800}
+main{max-width:740px;margin:0 auto;padding:14px}
+.btn{border:0;border-radius:12px;padding:12px;font-weight:700;min-height:46px;font:inherit;cursor:pointer}
+.primary{background:#e8a23a;color:#1a1408}.ghost{background:transparent;color:#eef3f8;border:1px solid #334058}
+.card{background:#222c3d;border:1px solid #334058;border-radius:14px;padding:14px;margin:12px 0}
+label{display:flex;flex-direction:column;gap:5px;margin:8px 0;color:#9aa8b8;font-size:13px}
+input,select{background:#121821;color:#eef3f8;border:1px solid #334058;border-radius:10px;padding:10px;min-height:44px;font:inherit}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.hidden{display:none!important}.ok{color:#3ecf8e;font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{border:1px solid #334058;background:#121821;color:#eef3f8;border-radius:999px;padding:9px 11px;min-height:42px}
+.chip.on{background:#e8a23a;color:#1a1408;font-weight:700}
+.kpi,.item{background:#121821;border-radius:12px;padding:12px;margin:8px 0}
+.muted{color:#9aa8b8;font-size:13px}
+dialog{background:#1a2332;color:#eef3f8;border:1px solid #334058;border-radius:16px;width:min(92vw,420px);padding:16px}
+</style></head>
+<body>
+<header><div class="logo">WK</div><div style="flex:1"><strong>WerkstattKalk</strong></div>
+<button type="button" class="btn ghost" onclick="openSet()">Einst.</button></header>
+<main id="home">
+<h1>Start</h1>
+<div class="actions">
+<button type="button" class="btn primary" onclick="openCustDlg()">Neuer Kunde</button>
+<button type="button" class="btn ghost" onclick="seed();listCust()">Beispiele</button>
+</div>
+<section class="card" id="custList"></section>
+</main>
+<main id="cust" class="hidden">
+<div class="actions"><button type="button" class="btn ghost" onclick="goHome()">Zurueck</button>
+<button type="button" class="btn primary" onclick="newQuote()">Neues Angebot</button></div>
+<h1 id="custTitle">Kunde</h1>
+<section class="card" id="quoteList"></section>
+</main>
+<main id="part" class="hidden">
+<button type="button" class="btn ghost" onclick="backCust()">Zur Liste</button>
+<section class="card">
+<label>Bezeichnung <input id="pname"></label>
+<label>Artikelnr. <input id="drawingNo"></label>
+<label>Stueck Fertigteil <input id="qty" type="number" value="1" oninput="sum()"></label>
+</section>
+<section class="card">
+<h2>Bearbeitungen</h2>
+<div class="chips" id="chips"></div>
+<div id="steps"></div>
+</section>
+<section class="card">
+<div id="pos"></div>
+<div class="kpi">Netto <span class="ok" id="cNet">-</span></div>
+<div class="kpi">MwSt 19% <span class="ok" id="cVat">-</span></div>
+<div class="kpi">Brutto <span class="ok" id="cGross">-</span></div>
+<button type="button" class="btn primary" onclick="saveJob()">Speichern</button>
+</section>
+</main>
+<main id="setp" class="hidden">
+<button type="button" class="btn ghost" onclick="goHome()">Zurueck</button>
+<section class="card">
+<label>EUR/h Abkanten <input id="r_bend" type="number"></label>
+<label>EUR/h Schweissen <input id="r_weld" type="number"></label>
+<label>Standard Kantung Sekunden <input id="c_bend" type="number" step="0.1"></label>
+<label>Umsetzen je Naht Sekunden <input id="c_repo" type="number" step="0.1"></label>
+</section>
+<button type="button" class="btn primary" onclick="saveSet()">Speichern</button>
+</main>
+<dialog id="dlg"><h3>Neuer Kunde</h3>
+<label>Name <input id="dn"></label><label>Kd-Nr <input id="dk"></label>
+<div class="actions"><button type="button" class="btn ghost" onclick="document.getElementById('dlg').close()">Abbrechen</button>
+<button type="button" class="btn primary" onclick="okCust()">OK</button></div></dialog>
+<script>
+function $(i){return document.getElementById(i)}
+function N(v){var n=parseFloat(String(v).replace(',','.'));return isFinite(n)?n:0}
+function euro(n){return N(n).toFixed(2).replace('.',',')+' EUR'}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,4)}
+var STEPS=[{k:'bend',n:'Abkanten'},{k:'mag',n:'MAG / MIG'},{k:'wig',n:'WIG'},{k:'lh',n:'Laserhand'},{k:'lw',n:'Laserschweissen'},{k:'bolt',n:'Bolzenschiessen'},{k:'spot',n:'Punktschweissen'}];
+var S={custs:[],quotes:[],cid:null,job:null,sel:[],v:{},x:{},rates:{bend:70,weld:75},spd:{bend:25,repo:25}};
+function load(){try{S.custs=JSON.parse(localStorage.getItem('wk3c')||'[]');S.quotes=JSON.parse(localStorage.getItem('wk3q')||'[]');var r=JSON.parse(localStorage.getItem('wk3r')||'null');if(r)S.rates=r;var p=JSON.parse(localStorage.getItem('wk3s')||'null');if(p)S.spd=p}catch(e){}}
+function persist(){localStorage.setItem('wk3c',JSON.stringify(S.custs));localStorage.setItem('wk3q',JSON.stringify(S.quotes));localStorage.setItem('wk3r',JSON.stringify(S.rates));localStorage.setItem('wk3s',JSON.stringify(S.spd))}
+function show(id){['home','cust','part','setp'].forEach(function(x){$(x).classList.toggle('hidden',x!==id)})}
+function goHome(){show('home');listCust()}
+function listCust(){var b=$('custList');if(!S.custs.length){b.innerHTML='<p class="muted">Kein Kunde.</p>';return}b.innerHTML=S.custs.map(function(c){return '<article class="item" onclick="openC(\''+c.id+'\')"><strong>'+c.name+'</strong></article>'}).join('')}
+function openCustDlg(){$('dn').value='';$('dk').value='';$('dlg').showModal()}
+function okCust(){var n=$('dn').value.trim();if(!n)return;S.custs.push({id:uid(),name:n,nr:$('dk').value.trim()});persist();$('dlg').close();listCust()}
+function seed(){S.custs=[{id:'c1',name:'Bahntechnik Mueller',nr:'01'}];persist();listCust()}
+function openC(id){S.cid=id;var c=S.custs.filter(function(x){return x.id===id})[0];$('custTitle').textContent=c?c.name:'Kunde';var qs=S.quotes.filter(function(q){return q.cid===id});$('quoteList').innerHTML=qs.length?qs.map(function(q){return '<article class="item" onclick="openQ(\''+q.id+'\')"><strong>'+q.name+'</strong><div class="ok">'+(q.g||'')+'</div></article>'}).join(''):'<p class="muted">Kein Angebot.</p>';show('cust')}
+function backCust(){openC(S.cid)}
+function drawChips(){$('chips').innerHTML=STEPS.map(function(s){return '<button type="button" class="chip'+(S.sel.indexOf(s.k)>=0?' on':'')+'" onclick="tog(\''+s.k+'\')">'+s.n+'</button>'}).join('')}
+function tog(k){var i=S.sel.indexOf(k);if(i>=0)S.sel.splice(i,1);else S.sel.push(k);drawChips();drawSteps();sum()}
+function drawSteps(){var h='';S.sel.forEach(function(k){if(k==='bend')h+='<label>Anzahl Kantungen<input id="v_bend" type="number" value="'+(S.v.bend||'')+'" oninput="sum()"></label><label>Minuten JE Kantung (dieses Teil)<input id="x_bend" type="number" step="0.1" value="'+(S.x.bend||'')+'" oninput="sum()"></label><p class="muted">Leer = Standard '+S.spd.bend+' s. Schwierig: 5 Minuten.</p>';
+else if(k==='spot')h+='<label>Anzahl Punkte<input id="v_spot" type="number" value="'+(S.v.spot||'')+'" oninput="sum()"></label><label>Minuten Arbeitsgang je Fertigteil<input id="x_spot" type="number" step="0.1" value="'+(S.x.spot||'')+'" oninput="sum()"></label>';
+else if(k==='bolt')h+='<label>Anzahl Bolzen je Teil<input id="v_bolt" type="number" value="'+(S.v.bolt||'')+'" oninput="sum()"></label><p class="muted">Keine extra Lohnzeit.</p>';
+else h+='<label>'+STEPS.filter(function(s){return s.k===k})[0].n+' mm<input id="v_'+k+'" type="number" value="'+(S.v[k]||'')+'" oninput="sum()"></label><label>Anzahl Schweissnaehte<input id="n_'+k+'" type="number" value="'+(S.v['n'+k]||1)+'" oninput="sum()"></label>';});
+$('steps').innerHTML=h||'<p class="muted">Schritt waehlen.</p>'}
+function read(){S.sel.forEach(function(k){if($('v_'+k))S.v[k]=N($('v_'+k).value);if($('x_'+k))S.x[k]=N($('x_'+k).value);if($('n_'+k))S.v['n'+k]=N($('n_'+k).value)})}
+function calc(){read();var q=N($('qty').value)||1,rows=[],net=0;
+S.sel.forEach(function(k){var eur=0,txt='';
+if(k==='bend'){var n=N(S.v.bend),per=N(S.x.bend);var min=per>0?n*per:n*N(S.spd.bend)/60;eur=min*S.rates.bend*q;txt='Abkanten '+n+' Kanten · '+min.toFixed(2)+' min'}
+else if(k==='spot'){var min=N(S.x.spot);if(!min)min=N(S.v.spot)*8/60;eur=min*S.rates.weld*q;txt='Punktschweissen '+min.toFixed(2)+' min'}
+else if(k==='bolt'){eur=0;txt='Bolzenschiessen '+N(S.v.bolt)+' Stk (ohne Lohnzeit)'}
+else {var mm=N(S.v[k]),ns=Math.max(1,N(S.v['n'+k])||1);var min=mm/4/60+ns*N(S.spd.repo)/60;eur=min*S.rates.weld*q;txt=k+' '+mm+' mm, '+ns+' Naehte'}
+rows.push({n:txt,eur:eur});net+=eur});
+return {rows:rows,net:net,vat:net*0.19,gross:net*1.19}}
+function sum(){var p=calc();$('pos').innerHTML=p.rows.map(function(r){return '<div class="item">'+r.n+'<div class="ok">'+euro(r.eur)+'</div></div>'}).join('');$('cNet').textContent=euro(p.net);$('cVat').textContent=euro(p.vat);$('cGross').textContent=euro(p.gross)}
+function newQuote(){S.job={id:uid()};S.sel=[];S.v={};S.x={};$('pname').value='';$('drawingNo').value='';drawChips();drawSteps();show('part');sum()}
+function openQ(id){var q=S.quotes.filter(function(x){return x.id===id})[0];if(!q)return;S.job=q;S.sel=(q.sel||[]).slice();S.v=Object.assign({},q.v||{});S.x=Object.assign({},q.x||{});$('pname').value=q.name||'';$('drawingNo').value=q.zn||'';$('qty').value=q.qty||1;drawChips();drawSteps();show('part');sum()}
+function saveJob(){read();if(!$('pname').value.trim()){alert('Bezeichnung');return}var p=calc();var j={id:S.job&&S.job.id?S.job.id:uid(),cid:S.cid,name:$('pname').value.trim(),zn:$('drawingNo').value.trim(),qty:N($('qty').value)||1,sel:S.sel.slice(),v:Object.assign({},S.v),x:Object.assign({},S.x),g:euro(p.gross)};S.quotes=S.quotes.filter(function(x){return x.id!==j.id});S.quotes.unshift(j);persist();openC(S.cid)}
+function openSet(){$('r_bend').value=S.rates.bend;$('r_weld').value=S.rates.weld;$('c_bend').value=S.spd.bend;$('c_repo').value=S.spd.repo;show('setp')}
+function saveSet(){S.rates.bend=N($('r_bend').value);S.rates.weld=N($('r_weld').value);if(N($('c_bend').value))S.spd.bend=N($('c_bend').value);if(N($('c_repo').value))S.spd.repo=N($('c_repo').value);persist();goHome()}
+load();if(!S.custs.length)seed();listCust();
+</script></body></html>
