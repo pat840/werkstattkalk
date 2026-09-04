@@ -1,71 +1,145 @@
 <!DOCTYPE html>
-<html lang="de"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>WerkstattKalk</title>
-<style>body{font-family:system-ui;background:#121821;color:#eef3f8;margin:0}header{display:flex;gap:10px;align-items:center;padding:12px;background:#1a2332}.logo{width:36px;height:36px;border-radius:10px;background:#e8a23a;color:#1a1408;display:grid;place-items:center;font-weight:800}main{max-width:740px;margin:0 auto;padding:16px}.btn{border:0;border-radius:12px;padding:13px 14px;font-weight:700;min-height:48px;font:inherit;cursor:pointer}.primary{background:#e8a23a;color:#1a1408}.ghost{background:transparent;color:#eef3f8;border:1px solid #334058}.card{background:#222c3d;border:1px solid #334058;border-radius:14px;padding:14px;margin:12px 0}label{display:flex;flex-direction:column;gap:6px;margin:8px 0;color:#9aa8b8}input,select{background:#121821;color:#eef3f8;border:1px solid #334058;border-radius:10px;padding:11px;min-height:44px;font:inherit}input[readonly]{color:#3ecf8e;font-weight:800}.actions{display:flex;gap:8px;flex-wrap:wrap}.hidden{display:none!important}.ok{color:#3ecf8e;font-weight:700}.chips{display:flex;flex-wrap:wrap;gap:8px}.chip{border:1px solid #334058;background:#121821;color:#eef3f8;border-radius:999px;padding:10px 12px;min-height:44px;cursor:pointer}.chip.on{background:#e8a23a;color:#1a1408}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}@media(max-width:640px){.grid2{grid-template-columns:1fr}}.kpi{background:#121821;border-radius:12px;padding:10px;margin:8px 0}.item{background:#121821;border-radius:12px;padding:12px;margin:8px 0}dialog{background:#1a2332;color:#eef3f8;border:1px solid #334058;border-radius:16px;width:min(92vw,420px);padding:16px}.muted{color:#9aa8b8}</style></head>
+<html lang="de"><head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>WerkstattKalk</title>
+<style>
+body{font-family:system-ui;background:#121821;color:#eef3f8;margin:0}
+header{display:flex;gap:10px;align-items:center;padding:12px;background:#1a2332}
+.logo{width:36px;height:36px;border-radius:10px;background:#e8a23a;color:#1a1408;display:grid;place-items:center;font-weight:800}
+main{max-width:740px;margin:0 auto;padding:16px}
+.btn{border:0;border-radius:12px;padding:13px 14px;font-weight:700;min-height:48px;font:inherit;cursor:pointer}
+.primary{background:#e8a23a;color:#1a1408}.ghost{background:transparent;color:#eef3f8;border:1px solid #334058}
+.card{background:#222c3d;border:1px solid #334058;border-radius:14px;padding:14px;margin:12px 0}
+label{display:flex;flex-direction:column;gap:6px;margin:8px 0;color:#9aa8b8}
+input,select{background:#121821;color:#eef3f8;border:1px solid #334058;border-radius:10px;padding:11px;min-height:44px;font:inherit}
+input[readonly]{color:#3ecf8e;font-weight:800}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.hidden{display:none!important}.ok{color:#3ecf8e;font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid #334058;background:#121821;color:#eef3f8;border-radius:999px;padding:10px 12px;min-height:44px;cursor:pointer}
+.chip.on{background:#e8a23a;color:#1a1408;font-weight:700}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:640px){.grid2{grid-template-columns:1fr}}
+.kpi{background:#121821;border-radius:12px;padding:10px;margin:8px 0}
+.item{background:#121821;border-radius:12px;padding:12px;margin:8px 0}
+dialog{background:#1a2332;color:#eef3f8;border:1px solid #334058;border-radius:16px;width:min(92vw,420px);padding:16px}
+.muted{color:#9aa8b8;font-size:13px}h1{font-size:1.3rem}h2{margin:0 0 8px}
+table{width:100%;border-collapse:collapse}td,th{padding:6px 0;border-bottom:1px solid #334058;text-align:left}
+td.r,th.r{text-align:right}
+</style></head>
 <body>
-<header><div class="logo">WK</div><div><strong>WerkstattKalk</strong><div class="muted" id="hs">tippe die orangene Flaeche</div></div></header>
+<header>
+<div class="logo">WK</div>
+<div><strong>WerkstattKalk</strong><div class="muted">Angebot tippen und oeffnen</div></div>
+<button type="button" class="btn ghost" onclick="openSet()">Einst.</button>
+</header>
 <main id="home">
 <h1>Start</h1>
 <div class="actions">
-<button type="button" class="btn primary" id="btnNewCust" onclick="openCustDlg()">Neuer Kunde</button>
-<button type="button" class="btn ghost" id="btnDemo" onclick="seed();listCust();">Beispiele laden</button>
+<button type="button" class="btn primary" onclick="openCustDlg()">Neuer Kunde</button>
+<button type="button" class="btn ghost" onclick="seed();listCust();">Beispiele laden</button>
 </div>
 <section class="card" id="custList"></section>
 </main>
 <main id="cust" class="hidden">
-<button type="button" class="btn ghost" onclick="goHome()">Zurueck</button>
+<div class="actions"><button type="button" class="btn ghost" onclick="goHome()">Zurueck</button>
+<button type="button" class="btn primary" onclick="newQuote()">Neues Angebot</button></div>
 <h1 id="custTitle">Kunde</h1>
-<button type="button" class="btn primary" onclick="newQuote()">Neues Angebot</button>
+<p class="muted">Gespeichertes Angebot antippen zum Aendern.</p>
 <section class="card" id="quoteList"></section>
 </main>
 <main id="part" class="hidden">
-<button type="button" class="btn ghost" onclick="backCust()">Zurueck</button>
+<div class="actions"><button type="button" class="btn ghost" onclick="backCust()">Zur Liste</button></div>
 <section class="card">
-<label>Teil <input id="pname"></label>
+<h2>Teil</h2>
+<label>Bezeichnung <input id="pname"></label>
 <label>Artikelnr. <input id="drawingNo"></label>
-<label>Stueck <input id="qty" type="number" value="1"></label>
+<label>Stueck Fertigteil <input id="qty" type="number" value="1" min="1" oninput="sum()"></label>
 <label>Werkstoff <select id="materialSel" onchange="sum()"></select></label>
 <label>Staerke <select id="thicknessMm" onchange="sum()"></select></label>
 <label>Format <select id="fmt" onchange="togFree();sum();"></select></label>
-<div class="grid2 hidden" id="freeBox"><label>L mm <input id="lenMm" type="number" oninput="sum()"></label><label>B mm <input id="widMm" type="number" oninput="sum()"></label></div>
-<div class="kpi"><div class="muted">Gewicht (nur Rechnung)</div><input id="autoKg" readonly><div class="muted" id="autoHint"></div></div>
+<div class="grid2 hidden" id="freeBox">
+<label>L mm <input id="lenMm" type="number" oninput="sum()"></label>
+<label>B mm <input id="widMm" type="number" oninput="sum()"></label>
+</div>
+<div class="kpi"><div class="muted">Gewicht je Tafel</div><input id="autoKg" readonly><div class="muted" id="autoHint"></div></div>
 </section>
-<section class="card"><div class="chips" id="chips"></div><div id="steps"></div></section>
 <section class="card">
+<h2>Bearbeitungen</h2>
+<p class="muted">Mehrere waehlen. Jede Position einzeln mit Preis.</p>
+<div class="chips" id="chips"></div>
+<div id="steps"></div>
+</section>
+<section class="card">
+<h2>Positionen</h2>
+<div id="pos"></div>
 <div class="kpi">Netto <span class="ok" id="cNet">-</span></div>
-<div class="kpi">Enthaltene MwSt. 19% <span class="ok" id="cVat">-</span></div>
+<div class="kpi">Enthaltene MwSt. 19 % <span class="ok" id="cVat">-</span></div>
 <div class="kpi">Brutto <span class="ok" id="cGross">-</span></div>
-<button type="button" class="btn primary" onclick="saveJob()">Speichern</button>
+<div class="actions"><button type="button" class="btn primary" onclick="saveJob()">Speichern</button></div>
 </section>
 </main>
-<dialog id="dlg"><h3>Neuer Kunde</h3><label>Name <input id="dn"></label><label>Kd-Nr <input id="dk"></label><div class="actions"><button type="button" class="btn ghost" onclick="document.getElementById('dlg').close()">Abbrechen</button><button type="button" class="btn primary" onclick="okCust()">OK</button></div></dialog>
+<main id="setp" class="hidden">
+<button type="button" class="btn ghost" onclick="goHome()">Zurueck</button>
+<section class="card">
+<h2>Stundensaetze EUR/h</h2>
+<label>Lasern / Zuschnitt <input id="r_cut" type="number" value="95"></label>
+<label>Schweissen <input id="r_weld" type="number" value="75"></label>
+<label>Abkanten <input id="r_bend" type="number" value="70"></label>
+<label>Beizen EUR/h <input id="r_pik" type="number" value="65"></label>
+<label>Reinigen / Waschen EUR/h <input id="r_wash" type="number" value="55"></label>
+<label>Stanzen / Nippeln <input id="r_punch" type="number" value="70"></label>
+</section>
+<button type="button" class="btn primary" onclick="saveSet()">Einstellungen speichern</button>
+</main>
+<dialog id="dlg">
+<h3>Neuer Kunde</h3>
+<label>Name <input id="dn"></label>
+<label>Kd-Nr <input id="dk"></label>
+<div class="actions">
+<button type="button" class="btn ghost" onclick="document.getElementById('dlg').close()">Abbrechen</button>
+<button type="button" class="btn primary" onclick="okCust()">OK</button>
+</div>
+</dialog>
 <script>
 function $(id){return document.getElementById(id);}
 function N(v){var n=parseFloat(String(v).replace(',','.'));return isFinite(n)?n:0;}
 function euro(n){return N(n).toFixed(2).replace('.',',')+' EUR';}
 function kg(n){return N(n).toFixed(2).replace('.',',')+' kg';}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
 var TH=['0.63','0.75','0.80','1.00','1.25','1.50','2.00','2.50','3.00','4.00','5.00','6.00','8.00','10.00','12.00','15.00','20.00'];
 var FM=[{id:'k',n:'Kleinformat 2000 x 1000',L:2000,B:1000},{id:'m',n:'Mittelformat 2500 x 1250',L:2500,B:1250},{id:'g',n:'Grossformat 3000 x 1500',L:3000,B:1500},{id:'f',n:'Freie Masse',L:0,B:0}];
-var MATS=[{id:'S235JR',n:'S235JR',d:7.85},{id:'S355JR',n:'S355JR',d:7.85},{id:'1.4301',n:'1.4301',d:8},{id:'1.4571',n:'1.4571',d:8}];
-var STEPS=[['bend','Abkanten'],['mag','MAG / MIG'],['wig','WIG'],['bolt','Bolzenschiessen'],['spot','Punktschweissen'],['pik','Beizen'],['wash','Reinigen / Waschen']];
-var S={custs:[],quotes:[],cid:null,job:null,sel:[]};
-function load(){try{S.custs=JSON.parse(localStorage.getItem('wk_c')||'[]');S.quotes=JSON.parse(localStorage.getItem('wk_q')||'[]');}catch(e){S.custs=[];S.quotes=[];}}
-function save(){localStorage.setItem('wk_c',JSON.stringify(S.custs));localStorage.setItem('wk_q',JSON.stringify(S.quotes));}
-function show(id){['home','cust','part'].forEach(function(x){$(x).classList.toggle('hidden',x!==id);});}
+var MATS=[{id:'S235JR',n:'S235JR',d:7.85,e:1.2},{id:'S355JR',n:'S355JR',d:7.85,e:1.35},{id:'1.4301',n:'1.4301',d:8,e:4.8},{id:'1.4571',n:'1.4571',d:8,e:6.5}];
+var STEPS=[{k:'laser',n:'Laserzuschnitt',t:'min',r:'cut'},{k:'nipcut',n:'Nippelzuschnitt',t:'min',r:'cut'},{k:'nip',n:'Stanznippeln',t:'pc',r:'punch'},{k:'bend',n:'Abkanten',t:'bend',r:'bend'},{k:'mag',n:'MAG / MIG',t:'mm',r:'weld'},{k:'wig',n:'WIG',t:'mm',r:'weld'},{k:'bolt',n:'Bolzenschiessen',t:'pc',r:'weld'},{k:'spot',n:'Punktschweissen',t:'pc',r:'weld'},{k:'pik',n:'Beizen',t:'jobmin',r:'pik'},{k:'wash',n:'Reinigen / Waschen',t:'jobmin',r:'wash'}];
+var S={custs:[],quotes:[],cid:null,job:null,sel:[],vals:{},rates:{cut:95,weld:75,bend:70,pik:65,wash:55,punch:70}};
+function load(){try{S.custs=JSON.parse(localStorage.getItem('wk2c')||'[]');S.quotes=JSON.parse(localStorage.getItem('wk2q')||'[]');var r=JSON.parse(localStorage.getItem('wk2r')||'null'); if(r) S.rates=r;}catch(e){}}
+function persist(){localStorage.setItem('wk2c',JSON.stringify(S.custs));localStorage.setItem('wk2q',JSON.stringify(S.quotes));localStorage.setItem('wk2r',JSON.stringify(S.rates));}
+function show(id){['home','cust','part','setp'].forEach(function(x){$(x).classList.toggle('hidden',x!==id);});}
 function goHome(){show('home');listCust();}
-function listCust(){var b=$('custList'); if(!S.custs.length){b.innerHTML='<p class="muted">Noch kein Kunde. Tippe Neuer Kunde.</p>';return;} b.innerHTML=S.custs.map(function(c){return '<article class="item" onclick="openC(\''+c.id+'\')"><strong>'+c.name+'</strong><div class="muted">'+c.nr+'</div></article>';}).join('');}
+function openSet(){$('r_cut').value=S.rates.cut;$('r_weld').value=S.rates.weld;$('r_bend').value=S.rates.bend;$('r_pik').value=S.rates.pik;$('r_wash').value=S.rates.wash;$('r_punch').value=S.rates.punch;show('setp');}
+function saveSet(){S.rates.cut=N($('r_cut').value);S.rates.weld=N($('r_weld').value);S.rates.bend=N($('r_bend').value);S.rates.pik=N($('r_pik').value);S.rates.wash=N($('r_wash').value);S.rates.punch=N($('r_punch').value);persist();alert('Gespeichert');goHome();}
+function listCust(){var b=$('custList'); if(!S.custs.length){b.innerHTML='<p class="muted">Noch kein Kunde.</p>';return;} b.innerHTML=S.custs.map(function(c){var n=S.quotes.filter(function(q){return q.cid===c.id;}).length; return '<article class="item" onclick="openC(\''+c.id+'\')"><strong>'+c.name+'</strong><div class="muted">'+c.nr+' · '+n+' Angebot(e)</div></article>';}).join('');}
 function openCustDlg(){$('dn').value='';$('dk').value='';$('dlg').showModal();}
-function okCust(){var n=$('dn').value.trim(); if(!n)return; S.custs.push({id:Date.now().toString(36),name:n,nr:$('dk').value.trim()}); save(); $('dlg').close(); listCust();}
-function seed(){S.custs=[{id:'c1',name:'Bahntechnik Mueller',nr:'01'},{id:'c2',name:'Fahrzeugbau Huber',nr:'02'}]; save();}
-function openC(id){S.cid=id; var c=S.custs.filter(function(x){return x.id===id;})[0]; $('custTitle').textContent=c?c.name:'Kunde'; var qs=S.quotes.filter(function(q){return q.cid===id;}); $('quoteList').innerHTML=qs.length?qs.map(function(q){return '<article class="item"><strong>'+q.name+'</strong></article>';}).join(''):'<p class="muted">Noch kein Angebot.</p>'; show('cust');}
+function okCust(){var n=$('dn').value.trim(); if(!n)return; S.custs.push({id:uid(),name:n,nr:$('dk').value.trim()}); persist(); $('dlg').close(); listCust();}
+function seed(){S.custs=[{id:'c1',name:'Bahntechnik Mueller',nr:'01'},{id:'c2',name:'Fahrzeugbau Huber',nr:'02'}]; persist(); listCust();}
+function openC(id){S.cid=id; var c=S.custs.filter(function(x){return x.id===id;})[0]; $('custTitle').textContent=c?c.name:'Kunde'; var qs=S.quotes.filter(function(q){return q.cid===id;}); $('quoteList').innerHTML=qs.length?qs.map(function(q){return '<article class="item" onclick="openQ(\''+q.id+'\')"><strong>'+q.name+'</strong><div class="muted">'+(q.zn||'')+' · antippen zum Aendern</div><div class="ok">'+(q.grossTxt||'')+'</div></article>';}).join(''):'<p class="muted">Noch kein Angebot.</p>'; show('cust');}
 function backCust(){openC(S.cid);}
-function fillSelects(){$('materialSel').innerHTML=MATS.map(function(m){return '<option value="'+m.id+'">'+m.n+'</option>';}).join(''); $('thicknessMm').innerHTML=TH.map(function(t){return '<option value="'+t+'">'+t.replace('.',',')+' mm</option>';}).join(''); $('fmt').innerHTML=FM.map(function(f){return '<option value="'+f.id+'">'+f.n+'</option>';}).join(''); $('thicknessMm').value='8.00'; $('fmt').value='k'; $('chips').innerHTML=STEPS.map(function(s){return '<button type="button" class="chip" data-k="'+s[0]+'" onclick="tog(this)">'+s[1]+'</button>';}).join('');}
-function tog(btn){btn.classList.toggle('on'); var k=btn.getAttribute('data-k'); if(S.sel.indexOf(k)>=0) S.sel=S.sel.filter(function(x){return x!==k;}); else S.sel.push(k); drawSteps(); sum();}
-function drawSteps(){var h=''; if(S.sel.indexOf('bend')>=0) h+='<label>Kantungen je Stueck <input id="bends" type="number" value="1" oninput="sum()"></label>'; $('steps').innerHTML=h||'<p class="muted">Schritte oben waehlen. Abkanten = Stueckzahl Kanten.</p>';}
+function stepBy(k){for(var i=0;i<STEPS.length;i++) if(STEPS[i].k===k) return STEPS[i]; return STEPS[0];}
+function fillSelects(){$('materialSel').innerHTML=MATS.map(function(m){return '<option value="'+m.id+'">'+m.n+'</option>';}).join(''); $('thicknessMm').innerHTML=TH.map(function(t){return '<option value="'+t+'">'+t.replace('.',',')+' mm</option>';}).join(''); $('fmt').innerHTML=FM.map(function(f){return '<option value="'+f.id+'">'+f.n+'</option>';}).join('');}
+function drawChips(){$('chips').innerHTML=STEPS.map(function(s){var on=S.sel.indexOf(s.k)>=0; return '<button type="button" class="chip'+(on?' on':'')+'" onclick="tog(\''+s.k+'\')">'+s.n+'</button>';}).join('');}
+function tog(k){var i=S.sel.indexOf(k); if(i>=0) S.sel.splice(i,1); else S.sel.push(k); drawChips(); drawSteps(); sum();}
+function hint(t){if(t==='bend')return 'Anzahl Kantungen je Stueck'; if(t==='mm')return 'Naht / Schnitt mm'; if(t==='pc')return 'Stueckzahl'; if(t==='min')return 'Minuten je Stueck'; return 'Minuten gesamt (nicht je Stueck)';}
+function drawSteps(){var h=''; S.sel.forEach(function(k){var s=stepBy(k); h+='<label>'+s.n+' — '+hint(s.t)+'<input id="v_'+k+'" type="number" step="0.1" value="'+(S.vals[k]||'')+'" oninput="sum()"></label>';}); $('steps').innerHTML=h||'<p class="muted">Oben Bearbeitung waehlen.</p>';}
 function togFree(){var f=$('fmt').value==='f'; $('freeBox').classList.toggle('hidden',!f); if(!f){var x=FM.filter(function(z){return z.id===$('fmt').value;})[0]; $('lenMm').value=x.L; $('widMm').value=x.B;}}
 function size(){var id=$('fmt').value,f=FM.filter(function(z){return z.id===id;})[0]; if(id!=='f') return f; return {L:N($('lenMm').value),B:N($('widMm').value)};}
-function dens(){var id=$('materialSel').value; for(var i=0;i<MATS.length;i++) if(MATS[i].id===id) return MATS[i].d; return 7.85;}
-function sum(){var s=size(),t=N($('thicknessMm').value),w=(!s.L||!s.B||!t)?0:(s.L*s.B*t*dens()/1e6); $('autoKg').value=kg(w); $('autoHint').textContent=s.L+' x '+s.B+' x '+t+' mm'; var net=w*1.15*1.35*N($('qty').value||1); if(S.sel.indexOf('bend')>=0) net+=N($('bends')&&$('bends').value)*2; var vat=net*0.19; $('cNet').textContent=euro(net); $('cVat').textContent=euro(vat); $('cGross').textContent=euro(net+vat);}
-function newQuote(){S.sel=[]; fillSelects(); togFree(); $('pname').value=''; show('part'); sum();}
-function saveJob(){if(!$('pname').value.trim()){alert('Teilname');return;} S.quotes.unshift({id:Date.now().toString(36),cid:S.cid,name:$('pname').value.trim()}); save(); openC(S.cid);}
+function mat(){var id=$('materialSel').value; for(var i=0;i<MATS.length;i++) if(MATS[i].id===id) return MATS[i]; return MATS[0];}
+function readVals(){S.sel.forEach(function(k){var el=$('v_'+k); if(el) S.vals[k]=N(el.value);});}
+function positions(){readVals(); var q=N($('qty').value)||1, rows=[], s=size(), t=N($('thicknessMm').value), m=mat(); var w=(!s.L||!s.B||!t)?0:s.L*s.B*t*m.d/1e6; rows.push({n:'Material '+m.n+' '+s.L+'x'+s.B+'x'+t+' mm ('+kg(w)+')',eur:w*1.15*m.e}); S.sel.forEach(function(k){var st=stepBy(k), v=N(S.vals[k]), rate=S.rates[st.r]||70, eur=0, txt=st.n; if(st.t==='jobmin'){eur=(v/60)*rate; txt=st.n+' '+v+' min';} else if(st.t==='min'){eur=(v/60)*rate*q; txt=st.n+' '+v+' min je Stk';} else if(st.t==='bend'){eur=(v*25/60)*rate*q; txt=st.n+' '+v+' Kanten je Stk';} else if(st.t==='mm'){eur=(v/4/60)*rate*q; txt=st.n+' '+v+' mm';} else {eur=(v*8/60)*rate*q; txt=st.n+' '+v+' Stk';} rows.push({n:txt,eur:eur});}); var net=0; rows.forEach(function(r){net+=r.eur;}); return {rows:rows,w:w,s:s,t:t,net:net,vat:net*0.19,gross:net*1.19,q:q};}
+function sum(){var p=positions(); $('autoKg').value=kg(p.w); $('autoHint').textContent=p.s.L+' x '+p.s.B+' x '+p.t+' mm'; $('pos').innerHTML='<table><tr><th>Position</th><th class="r">Betrag</th></tr>'+p.rows.map(function(r){return '<tr><td>'+r.n+'</td><td class="r">'+euro(r.eur)+'</td></tr>';}).join('')+'</table>'; $('cNet').textContent=euro(p.net); $('cVat').textContent=euro(p.vat); $('cGross').textContent=euro(p.gross);}
+function collect(){readVals(); return {id:S.job&&S.job.id?S.job.id:uid(),cid:S.cid,name:$('pname').value.trim(),zn:$('drawingNo').value.trim(),qty:N($('qty').value)||1,mat:$('materialSel').value,th:$('thicknessMm').value,fmt:$('fmt').value,L:N($('lenMm').value),B:N($('widMm').value),sel:S.sel.slice(),vals:Object.assign({},S.vals),grossTxt:euro(positions().gross)};}
+function fillJob(j){S.job=j; S.sel=(j.sel||[]).slice(); S.vals=Object.assign({},j.vals||{}); fillSelects(); drawChips(); $('pname').value=j.name||''; $('drawingNo').value=j.zn||''; $('qty').value=j.qty||1; $('materialSel').value=j.mat||'S355JR'; $('thicknessMm').value=j.th||'8.00'; $('fmt').value=j.fmt||'k'; $('lenMm').value=j.L||''; $('widMm').value=j.B||''; togFree(); drawSteps(); S.sel.forEach(function(k){if($('v_'+k)) $('v_'+k).value=S.vals[k]||'';}); show('part'); sum();}
+function newQuote(){fillJob({id:uid(),cid:S.cid,name:'',zn:'',qty:1,mat:'S355JR',th:'8.00',fmt:'k',L:2000,B:1000,sel:[],vals:{}});}
+function openQ(id){var q=S.quotes.filter(function(x){return x.id===id;})[0]; if(q) fillJob(JSON.parse(JSON.stringify(q)));}
+function saveJob(){var j=collect(); if(!j.name){alert('Bitte Bezeichnung angeben');return;} S.quotes=S.quotes.filter(function(x){return x.id!==j.id;}); S.quotes.unshift(j); persist(); openC(S.cid);}
 load(); if(!S.custs.length) seed(); listCust();
 </script></body></html>
