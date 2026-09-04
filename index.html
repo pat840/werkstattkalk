@@ -1,139 +1,71 @@
 <!DOCTYPE html>
-<html lang="de"><head>
-<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>WerkstattKalk</title>
-<style>
-:root{--bg:#121821;--card:#222c3d;--line:#334058;--txt:#eef3f8;--mu:#9aa8b8;--ac:#e8a23a;--ok:#3ecf8e}
-*{box-sizing:border-box}body{margin:0;font-family:system-ui,sans-serif;background:var(--bg);color:var(--txt)}
-header{position:sticky;top:0;z-index:5;display:flex;gap:8px;align-items:center;padding:10px 12px;background:#1a2332;border-bottom:1px solid var(--line)}
-.logo{width:36px;height:36px;border-radius:10px;background:var(--ac);color:#1a1408;display:grid;place-items:center;font-weight:800}
-.brand{flex:1}.brand small{display:block;color:var(--mu);font-size:12px}
-button{font:inherit;cursor:pointer}
-.icon{min-width:44px;min-height:44px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--txt)}
-main{max-width:760px;margin:0 auto;padding:14px 14px 48px}
-h1{font-size:1.28rem;margin:.2rem 0 .5rem}h2{margin:0 0 8px;font-size:1.05rem}
-.ey{color:var(--ac);font-size:12px;font-weight:700;text-transform:uppercase}
-.mu{color:var(--mu);font-size:13px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px;margin:10px 0}
-label{display:flex;flex-direction:column;gap:5px;font-size:13px;color:var(--mu);margin:8px 0}
-input,select,textarea{background:#121821;color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit;min-height:44px}
-input[readonly]{background:#1a2332;color:var(--ok);font-weight:800}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-@media(max-width:640px){.g2{grid-template-columns:1fr}}
-.btn{border:0;border-radius:12px;padding:12px 14px;font-weight:700;min-height:46px}
-.pri{background:var(--ac);color:#1a1408}.gh{background:transparent;color:var(--txt);border:1px solid var(--line)}
-.link{background:0;border:0;color:#7eb0ff;min-height:42px}
-.item{background:#121821;border-radius:12px;padding:11px;margin:7px 0}
-.ok{color:var(--ok);font-weight:700;text-align:right}
-.act{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-.hid{display:none!important}
-dialog{border:1px solid var(--line);border-radius:16px;background:#1a2332;color:var(--txt);width:min(94vw,420px);padding:14px}
-.chk{flex-direction:row;align-items:center;gap:8px}.chk input{width:18px;min-height:auto}
-.chips{display:flex;flex-wrap:wrap;gap:7px}
-.chip{border:1px solid var(--line);background:#121821;color:var(--txt);border-radius:999px;padding:9px 11px;min-height:42px}
-.chip.on{background:var(--ac);color:#1a1408;border-color:var(--ac);font-weight:700}
-.kpi{background:#121821;border-radius:12px;padding:10px}
-#sheet{display:none}
-@media print{header,.np,dialog,main{display:none!important}body{background:#fff;color:#111}#sheet{display:block!important}#sheet table{width:100%;border-collapse:collapse}#sheet td,#sheet th{border:1px solid #ccc;padding:6px;font-size:12px}}
-</style></head><body>
-<header class="np">
-<button type="button" class="icon" id="back" hidden>Zurueck</button>
-<div class="logo">WK</div>
-<div class="brand"><strong id="ht">WerkstattKalk</strong><small id="hs">Kalkulation</small></div>
-<button type="button" class="icon" id="set">Einst.</button>
-</header>
+<html lang="de"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>WerkstattKalk</title>
+<style>body{font-family:system-ui;background:#121821;color:#eef3f8;margin:0}header{display:flex;gap:10px;align-items:center;padding:12px;background:#1a2332}.logo{width:36px;height:36px;border-radius:10px;background:#e8a23a;color:#1a1408;display:grid;place-items:center;font-weight:800}main{max-width:740px;margin:0 auto;padding:16px}.btn{border:0;border-radius:12px;padding:13px 14px;font-weight:700;min-height:48px;font:inherit;cursor:pointer}.primary{background:#e8a23a;color:#1a1408}.ghost{background:transparent;color:#eef3f8;border:1px solid #334058}.card{background:#222c3d;border:1px solid #334058;border-radius:14px;padding:14px;margin:12px 0}label{display:flex;flex-direction:column;gap:6px;margin:8px 0;color:#9aa8b8}input,select{background:#121821;color:#eef3f8;border:1px solid #334058;border-radius:10px;padding:11px;min-height:44px;font:inherit}input[readonly]{color:#3ecf8e;font-weight:800}.actions{display:flex;gap:8px;flex-wrap:wrap}.hidden{display:none!important}.ok{color:#3ecf8e;font-weight:700}.chips{display:flex;flex-wrap:wrap;gap:8px}.chip{border:1px solid #334058;background:#121821;color:#eef3f8;border-radius:999px;padding:10px 12px;min-height:44px;cursor:pointer}.chip.on{background:#e8a23a;color:#1a1408}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}@media(max-width:640px){.grid2{grid-template-columns:1fr}}.kpi{background:#121821;border-radius:12px;padding:10px;margin:8px 0}.item{background:#121821;border-radius:12px;padding:12px;margin:8px 0}dialog{background:#1a2332;color:#eef3f8;border:1px solid #334058;border-radius:16px;width:min(92vw,420px);padding:16px}.muted{color:#9aa8b8}</style></head>
+<body>
+<header><div class="logo">WK</div><div><strong>WerkstattKalk</strong><div class="muted" id="hs">tippe die orangene Flaeche</div></div></header>
 <main id="home">
-<p class="ey">Suche / Kunden</p>
-<h1>Artikel oder Kunde</h1>
-<label>Artikelnr. / Name<input id="q" placeholder="SF-8841 oder Konsolblech"></label>
-<section class="card hid" id="hits"></section>
-<div class="act">
-<button type="button" class="btn pri" id="nc">Neuer Kunde</button>
-<button type="button" class="btn gh" id="demo">Beispiele</button>
+<h1>Start</h1>
+<div class="actions">
+<button type="button" class="btn primary" id="btnNewCust" onclick="openCustDlg()">Neuer Kunde</button>
+<button type="button" class="btn ghost" id="btnDemo" onclick="seed();listCust();">Beispiele laden</button>
 </div>
-<section class="card" id="clist"></section>
+<section class="card" id="custList"></section>
 </main>
-<main id="cust" class="hid">
-<p class="ey" id="ceye">Kunde</p><h1 id="ct">Kunde</h1>
-<div class="act"><button type="button" class="btn pri" id="nq">Neues Angebot</button></div>
-<section class="card" id="qlist"></section>
+<main id="cust" class="hidden">
+<button type="button" class="btn ghost" onclick="goHome()">Zurueck</button>
+<h1 id="custTitle">Kunde</h1>
+<button type="button" class="btn primary" onclick="newQuote()">Neues Angebot</button>
+<section class="card" id="quoteList"></section>
 </main>
-<main id="part" class="hid">
+<main id="part" class="hidden">
+<button type="button" class="btn ghost" onclick="backCust()">Zurueck</button>
 <section class="card">
-<h2>Artikel</h2>
-<div class="g2"><label>Angebotsnr.<input id="no"></label><label>Datum<input id="dt" type="date"></label></div>
-<div class="g2"><label>Artikelnr.<input id="zn"></label><label>Stueck Fertigteil<input id="qty" type="number" value="1" min="1"></label></div>
-<label>Bezeichnung<input id="nm"></label>
+<label>Teil <input id="pname"></label>
+<label>Artikelnr. <input id="drawingNo"></label>
+<label>Stueck <input id="qty" type="number" value="1"></label>
+<label>Werkstoff <select id="materialSel" onchange="sum()"></select></label>
+<label>Staerke <select id="thicknessMm" onchange="sum()"></select></label>
+<label>Format <select id="fmt" onchange="togFree();sum();"></select></label>
+<div class="grid2 hidden" id="freeBox"><label>L mm <input id="lenMm" type="number" oninput="sum()"></label><label>B mm <input id="widMm" type="number" oninput="sum()"></label></div>
+<div class="kpi"><div class="muted">Gewicht (nur Rechnung)</div><input id="autoKg" readonly><div class="muted" id="autoHint"></div></div>
 </section>
+<section class="card"><div class="chips" id="chips"></div><div id="steps"></div></section>
 <section class="card">
-<h2>Tafel</h2>
-<label>Werkstoff<select id="mat"></select></label>
-<label>Materialstaerke<select id="th"></select></label>
-<label>Blechformat<select id="fmt"></select></label>
-<div class="g2 hid" id="free">
-<label>Laenge mm<input id="L" type="number"></label>
-<label>Breite mm<input id="B" type="number"></label>
-</div>
-<div class="g2">
-<label>Tafeln<input id="sh" type="number" value="1" min="1"></label>
-<label>Tafelpreis EUR<input id="tp" type="number" step="0.01"></label>
-</div>
-<label class="chk"><input type="checkbox" id="useT"> Tafelpreis statt kg-Preis</label>
-<div class="kpi">
-<div class="mu">Gewicht je Tafel (nur Rechnung)</div>
-<input id="kg" readonly>
-<div class="mu" id="kgh"></div>
-</div>
+<div class="kpi">Netto <span class="ok" id="cNet">-</span></div>
+<div class="kpi">Enthaltene MwSt. 19% <span class="ok" id="cVat">-</span></div>
+<div class="kpi">Brutto <span class="ok" id="cGross">-</span></div>
+<button type="button" class="btn primary" onclick="saveJob()">Speichern</button>
 </section>
-<section class="card">
-<h2>Bearbeitungen</h2>
-<p class="mu">Abkanten = Anzahl Kantungen je Stueck.</p>
-<div class="chips" id="chips"></div>
-</section>
-<section class="card"><h2>Mengen</h2><div id="steps"></div></section>
-<section class="card">
-<h2>Zukauf</h2>
-<label>Teil aus Liste<select id="cat"></select></label>
-<div class="g2"><label>Menge<input id="cq" type="number" value="1"></label><label>EUR<input id="cp" type="number" step="0.01"></label></div>
-<div class="act">
-<button type="button" class="btn gh" id="addc">Uebernehmen</button>
-<button type="button" class="btn gh" id="addf">Sonstiges + speichern</button>
-</div>
-<div id="buys"></div>
-</section>
-<section class="card">
-<h2>Summe</h2>
-<div class="g2">
-<div class="kpi"><div class="mu">Nettogesamt</div><div class="ok" id="cN">-</div></div>
-<div class="kpi"><div class="mu">Enthaltene MwSt. (19%)</div><div class="ok" id="cV">-</div></div>
-<div class="kpi"><div class="mu">Brutto</div><div class="ok" id="cG">-</div></div>
-<div class="kpi"><div class="mu">Bearbeitung</div><div class="ok" id="cL">-</div></div>
-<div class="kpi"><div class="mu">Material</div><div class="ok" id="cM">-</div></div>
-<div class="kpi"><div class="mu">Zukauf</div><div class="ok" id="cB">-</div></div>
-</div>
-</section>
-<div class="act np">
-<button type="button" class="btn pri" id="sv">Speichern</button>
-<button type="button" class="btn gh" id="rv">Als /2</button>
-<button type="button" class="btn gh" id="pr">Drucken</button>
-</div>
 </main>
-<main id="setp" class="hid">
-<section class="card"><h2>Firma</h2><label>Name<input id="sn"></label><label>Adresse<input id="sa"></label></section>
-<section class="card">
-<label>Verschnitt %<input id="sc" type="number" value="15"></label>
-<label>Aufschlag %<input id="mk" type="number" value="0"></label>
-<label>Bolzen EUR/Stk<input id="bp" type="number" step="0.01"></label>
-<label>Schweissmutter EUR/Stk<input id="np" type="number" step="0.01"></label>
-<label>Laser Stueckpreis EUR<input id="lp" type="number" step="0.01"></label>
-</section>
-<section class="card"><h2>EUR/h</h2><div id="rates"></div></section>
-<section class="card"><h2>EUR/kg</h2><div id="med"></div></section>
-<div class="act"><button type="button" class="btn pri" id="ss">Speichern</button></div>
-</main>
-<div id="sheet"></div>
-<dialog id="dlg"><h3 id="dtl"></h3><div id="db"></div>
-<div class="act"><button type="button" class="btn gh" id="dx">Abbrechen</button><button type="button" class="btn pri" id="dok">OK</button></div>
-</dialog>
-<script src="https://cdn.jsdelivr.net/gh/pat840/werkstattkalk@main/app.js?v=20260904c"></script>
-</body></html>
+<dialog id="dlg"><h3>Neuer Kunde</h3><label>Name <input id="dn"></label><label>Kd-Nr <input id="dk"></label><div class="actions"><button type="button" class="btn ghost" onclick="document.getElementById('dlg').close()">Abbrechen</button><button type="button" class="btn primary" onclick="okCust()">OK</button></div></dialog>
+<script>
+function $(id){return document.getElementById(id);}
+function N(v){var n=parseFloat(String(v).replace(',','.'));return isFinite(n)?n:0;}
+function euro(n){return N(n).toFixed(2).replace('.',',')+' EUR';}
+function kg(n){return N(n).toFixed(2).replace('.',',')+' kg';}
+var TH=['0.63','0.75','0.80','1.00','1.25','1.50','2.00','2.50','3.00','4.00','5.00','6.00','8.00','10.00','12.00','15.00','20.00'];
+var FM=[{id:'k',n:'Kleinformat 2000 x 1000',L:2000,B:1000},{id:'m',n:'Mittelformat 2500 x 1250',L:2500,B:1250},{id:'g',n:'Grossformat 3000 x 1500',L:3000,B:1500},{id:'f',n:'Freie Masse',L:0,B:0}];
+var MATS=[{id:'S235JR',n:'S235JR',d:7.85},{id:'S355JR',n:'S355JR',d:7.85},{id:'1.4301',n:'1.4301',d:8},{id:'1.4571',n:'1.4571',d:8}];
+var STEPS=[['bend','Abkanten'],['mag','MAG / MIG'],['wig','WIG'],['bolt','Bolzenschiessen'],['spot','Punktschweissen'],['pik','Beizen'],['wash','Reinigen / Waschen']];
+var S={custs:[],quotes:[],cid:null,job:null,sel:[]};
+function load(){try{S.custs=JSON.parse(localStorage.getItem('wk_c')||'[]');S.quotes=JSON.parse(localStorage.getItem('wk_q')||'[]');}catch(e){S.custs=[];S.quotes=[];}}
+function save(){localStorage.setItem('wk_c',JSON.stringify(S.custs));localStorage.setItem('wk_q',JSON.stringify(S.quotes));}
+function show(id){['home','cust','part'].forEach(function(x){$(x).classList.toggle('hidden',x!==id);});}
+function goHome(){show('home');listCust();}
+function listCust(){var b=$('custList'); if(!S.custs.length){b.innerHTML='<p class="muted">Noch kein Kunde. Tippe Neuer Kunde.</p>';return;} b.innerHTML=S.custs.map(function(c){return '<article class="item" onclick="openC(\''+c.id+'\')"><strong>'+c.name+'</strong><div class="muted">'+c.nr+'</div></article>';}).join('');}
+function openCustDlg(){$('dn').value='';$('dk').value='';$('dlg').showModal();}
+function okCust(){var n=$('dn').value.trim(); if(!n)return; S.custs.push({id:Date.now().toString(36),name:n,nr:$('dk').value.trim()}); save(); $('dlg').close(); listCust();}
+function seed(){S.custs=[{id:'c1',name:'Bahntechnik Mueller',nr:'01'},{id:'c2',name:'Fahrzeugbau Huber',nr:'02'}]; save();}
+function openC(id){S.cid=id; var c=S.custs.filter(function(x){return x.id===id;})[0]; $('custTitle').textContent=c?c.name:'Kunde'; var qs=S.quotes.filter(function(q){return q.cid===id;}); $('quoteList').innerHTML=qs.length?qs.map(function(q){return '<article class="item"><strong>'+q.name+'</strong></article>';}).join(''):'<p class="muted">Noch kein Angebot.</p>'; show('cust');}
+function backCust(){openC(S.cid);}
+function fillSelects(){$('materialSel').innerHTML=MATS.map(function(m){return '<option value="'+m.id+'">'+m.n+'</option>';}).join(''); $('thicknessMm').innerHTML=TH.map(function(t){return '<option value="'+t+'">'+t.replace('.',',')+' mm</option>';}).join(''); $('fmt').innerHTML=FM.map(function(f){return '<option value="'+f.id+'">'+f.n+'</option>';}).join(''); $('thicknessMm').value='8.00'; $('fmt').value='k'; $('chips').innerHTML=STEPS.map(function(s){return '<button type="button" class="chip" data-k="'+s[0]+'" onclick="tog(this)">'+s[1]+'</button>';}).join('');}
+function tog(btn){btn.classList.toggle('on'); var k=btn.getAttribute('data-k'); if(S.sel.indexOf(k)>=0) S.sel=S.sel.filter(function(x){return x!==k;}); else S.sel.push(k); drawSteps(); sum();}
+function drawSteps(){var h=''; if(S.sel.indexOf('bend')>=0) h+='<label>Kantungen je Stueck <input id="bends" type="number" value="1" oninput="sum()"></label>'; $('steps').innerHTML=h||'<p class="muted">Schritte oben waehlen. Abkanten = Stueckzahl Kanten.</p>';}
+function togFree(){var f=$('fmt').value==='f'; $('freeBox').classList.toggle('hidden',!f); if(!f){var x=FM.filter(function(z){return z.id===$('fmt').value;})[0]; $('lenMm').value=x.L; $('widMm').value=x.B;}}
+function size(){var id=$('fmt').value,f=FM.filter(function(z){return z.id===id;})[0]; if(id!=='f') return f; return {L:N($('lenMm').value),B:N($('widMm').value)};}
+function dens(){var id=$('materialSel').value; for(var i=0;i<MATS.length;i++) if(MATS[i].id===id) return MATS[i].d; return 7.85;}
+function sum(){var s=size(),t=N($('thicknessMm').value),w=(!s.L||!s.B||!t)?0:(s.L*s.B*t*dens()/1e6); $('autoKg').value=kg(w); $('autoHint').textContent=s.L+' x '+s.B+' x '+t+' mm'; var net=w*1.15*1.35*N($('qty').value||1); if(S.sel.indexOf('bend')>=0) net+=N($('bends')&&$('bends').value)*2; var vat=net*0.19; $('cNet').textContent=euro(net); $('cVat').textContent=euro(vat); $('cGross').textContent=euro(net+vat);}
+function newQuote(){S.sel=[]; fillSelects(); togFree(); $('pname').value=''; show('part'); sum();}
+function saveJob(){if(!$('pname').value.trim()){alert('Teilname');return;} S.quotes.unshift({id:Date.now().toString(36),cid:S.cid,name:$('pname').value.trim()}); save(); openC(S.cid);}
+load(); if(!S.custs.length) seed(); listCust();
+</script></body></html>
