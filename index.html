@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="de"><head>
-<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"/>
 <title>WerkstattKalk</title>
 <style>
 body{font-family:system-ui;background:#121821;color:#eef3f8;margin:0}
@@ -29,18 +29,19 @@ td.r,th.r{text-align:right}
 .thumbs{display:flex;flex-wrap:wrap;gap:8px}
 .thumbs img,.filechip{width:88px;height:88px;object-fit:cover;border-radius:8px;background:#121821}
 .filechip{display:grid;place-items:center;font-size:11px;text-align:center;padding:6px}
+#cv{width:100%;background:#000;border-radius:10px;touch-action:none}
 </style></head>
 <body>
 <header>
 <div class="logo">WK</div>
-<div style="flex:1"><strong>WerkstattKalk</strong><div class="muted">Kalkulation mit Zeichnung</div></div>
+<div style="flex:1"><strong>WerkstattKalk</strong><div class="muted">Zeichnung messen</div></div>
 <button type="button" class="btn ghost" onclick="openSet()">Einst.</button>
 </header>
 <main id="home">
 <h1>Start</h1>
 <div class="actions">
 <button type="button" class="btn primary" onclick="openCustDlg()">Neuer Kunde</button>
-<button type="button" class="btn ghost" onclick="seed();listCust()">Beispiele laden</button>
+<button type="button" class="btn ghost" onclick="seed();listCust()">Beispiele</button>
 </div>
 <section class="card" id="custList"></section>
 </main>
@@ -48,7 +49,6 @@ td.r,th.r{text-align:right}
 <div class="actions"><button type="button" class="btn ghost" onclick="goHome()">Zurueck</button>
 <button type="button" class="btn primary" onclick="newQuote()">Neues Angebot</button></div>
 <h1 id="custTitle">Kunde</h1>
-<p class="muted">Angebot antippen zum Oeffnen und Aendern.</p>
 <section class="card" id="quoteList"></section>
 </main>
 <main id="part" class="hidden">
@@ -68,33 +68,56 @@ td.r,th.r{text-align:right}
 <div class="kpi"><div class="muted">Gewicht je Tafel</div><input id="autoKg" readonly><div class="muted" id="autoHint"></div></div>
 </section>
 <section class="card">
+<h2>Zeichnung messen</h2>
+<p class="muted">1. Foto. 2. Massstab: zwei Punkte + bekanntes Mass. 3. Naht antippen.</p>
+<div class="actions">
+<label class="btn ghost">Foto Plan<input id="pic" type="file" accept="image/*" capture="environment" hidden onchange="addFile(this,1)"></label>
+<label class="btn ghost">PDF<input id="pdf" type="file" accept="application/pdf" hidden onchange="addFile(this,0)"></label>
+<button type="button" class="btn primary" onclick="openMeas()">Auf Plan messen</button>
+</div>
+<div class="thumbs" id="thumbs"></div>
+</section>
+<section class="card">
 <h2>Bearbeitungen</h2>
 <div class="chips" id="chips"></div>
 <div id="steps"></div>
 </section>
 <section class="card">
-<h2>Zukauf aus Katalog</h2>
+<h2>Zukauf</h2>
 <label>Teil <select id="catSel"></select></label>
-<div class="grid2"><label>Stk je Fertigteil <input id="catN" type="number" value="1"></label><label>EUR <input id="catP" type="number" step="0.01"></label></div>
+<div class="grid2"><label>Stk je Teil <input id="catN" type="number" value="1"></label><label>EUR <input id="catP" type="number" step="0.01"></label></div>
 <button type="button" class="btn ghost" onclick="addBuy()">Uebernehmen</button>
 <div id="buys"></div>
-</section>
-<section class="card">
-<h2>Zeichnungen / Fotos</h2>
-<div class="actions">
-<label class="btn ghost">Foto / Bild<input id="pic" type="file" accept="image/*" capture="environment" hidden onchange="addFile(this,1)"></label>
-<label class="btn ghost">PDF<input id="pdf" type="file" accept="application/pdf" hidden onchange="addFile(this,0)"></label>
-</div>
-<div class="thumbs" id="thumbs"></div>
 </section>
 <section class="card">
 <h2>Positionen</h2>
 <div id="pos"></div>
 <div class="kpi">Netto <span class="ok" id="cNet">-</span></div>
-<div class="kpi">Enthaltene MwSt. 19 % <span class="ok" id="cVat">-</span></div>
+<div class="kpi">MwSt. 19 % <span class="ok" id="cVat">-</span></div>
 <div class="kpi">Brutto <span class="ok" id="cGross">-</span></div>
 <button type="button" class="btn primary" onclick="saveJob()">Speichern</button>
 </section>
+</main>
+<main id="meas" class="hidden">
+<div class="actions">
+<button type="button" class="btn ghost" onclick="show('part')">Fertig</button>
+<button type="button" class="btn ghost" onclick="undoSeg()">Letzte Linie weg</button>
+</div>
+<p class="muted" id="mHint">Zuerst Massstab.</p>
+<div class="grid2">
+<label>Bekanntes Mass mm <input id="knownMm" type="number" value="100"></label>
+<label>Messen als
+<select id="mKind">
+<option value="scale">Massstab setzen</option>
+<option value="laser">Laserzuschnitt</option>
+<option value="mag">MAG / MIG</option>
+<option value="wig">WIG</option>
+<option value="lh">Laserhand</option>
+<option value="lw">Laserschweissen</option>
+</select></label>
+</div>
+<canvas id="cv"></canvas>
+<div class="kpi" id="mSum"></div>
 </main>
 <main id="setp" class="hidden">
 <button type="button" class="btn ghost" onclick="goHome()">Zurueck</button>
@@ -108,13 +131,23 @@ td.r,th.r{text-align:right}
 <label>Stanzen <input id="r_punch" type="number"></label>
 </section>
 <section class="card">
+<h2>Zeiten aus der Werkstatt</h2>
+<p class="muted">50 mm MAG in 12,5 s speichert mm/s. Kantung in Sekunden direkt.</p>
+<label>MAG: 50 mm in Sekunden <input id="c_mag" type="number" step="0.1"></label>
+<label>WIG: 50 mm in Sekunden <input id="c_wig" type="number" step="0.1"></label>
+<label>Laserhand: 50 mm in Sekunden <input id="c_lh" type="number" step="0.1"></label>
+<label>Laserschweissen: 50 mm in Sekunden <input id="c_lw" type="number" step="0.1"></label>
+<label>Laserzuschnitt: 50 mm in Sekunden <input id="c_cut" type="number" step="0.1"></label>
+<label>Eine Kantung in Sekunden <input id="c_bend" type="number" step="0.1"></label>
+<div class="kpi" id="spdShow"></div>
+</section>
+<section class="card">
 <h2>Zukauf-Datenbank</h2>
-<p class="muted">Nicht auftragsbezogen. Steht in jeder Kalkulation.</p>
 <div id="catEd"></div>
 <label>Neues Teil <input id="cnm"></label>
 <label>Art <select id="ckd"><option value="buy">Allgemein</option><option value="bolt">Schweissbolzen</option><option value="nut">Schweissmutter</option></select></label>
 <label>EUR/Stk <input id="cpr" type="number" step="0.01"></label>
-<button type="button" class="btn ghost" onclick="addCat()">In Datenbank speichern</button>
+<button type="button" class="btn ghost" onclick="addCat()">Speichern</button>
 </section>
 <button type="button" class="btn primary" onclick="saveSet()">Einstellungen speichern</button>
 </main>
@@ -131,18 +164,18 @@ function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2
 var TH=['0.63','0.75','0.80','1.00','1.25','1.50','2.00','2.50','3.00','4.00','5.00','6.00','8.00','10.00','12.00','15.00','20.00'];
 var FM=[{id:'k',n:'Kleinformat 2000 x 1000',L:2000,B:1000},{id:'m',n:'Mittelformat 2500 x 1250',L:2500,B:1250},{id:'g',n:'Grossformat 3000 x 1500',L:3000,B:1500},{id:'f',n:'Freie Masse',L:0,B:0}];
 var MATS=[{id:'S235JR',n:'S235JR',d:7.85,e:1.2},{id:'S355JR',n:'S355JR',d:7.85,e:1.35},{id:'1.4301',n:'1.4301',d:8,e:4.8},{id:'1.4571',n:'1.4571',d:8,e:6.5}];
-var STEPS=[{k:'laser',n:'Laserzuschnitt',t:'min',r:'cut'},{k:'nipcut',n:'Nippelzuschnitt',t:'min',r:'cut'},{k:'nip',n:'Stanznippeln',t:'pc',r:'punch'},{k:'bend',n:'Abkanten',t:'bend',r:'bend'},{k:'mag',n:'MAG / MIG',t:'mm',r:'weld'},{k:'wig',n:'WIG',t:'mm',r:'weld'},{k:'bolt',n:'Bolzenschiessen',t:'pick',r:'weld',g:'bolt'},{k:'spot',n:'Punktschweissen',t:'pick',r:'weld',g:'nut'},{k:'pik',n:'Beizen',t:'min',r:'pik'},{k:'wash',n:'Reinigen / Waschen',t:'min',r:'wash'}];
-var CAT0=[{id:'b6',n:'Schweissbolzen M6',p:.22,g:'bolt'},{id:'b8',n:'Schweissbolzen M8',p:.28,g:'bolt'},{id:'b10',n:'Schweissbolzen M10',p:.35,g:'bolt'},{id:'n6',n:'Schweissmutter M6',p:.18,g:'nut'},{id:'n8',n:'Schweissmutter M8',p:.24,g:'nut'},{id:'n10',n:'Schweissmutter M10',p:.32,g:'nut'},{id:'bu1',n:'Buchse 8x12x10',p:1.1,g:'buy'},{id:'bu2',n:'Buchse 10x14x12',p:1.35,g:'buy'},{id:'st',n:'Stutzen 20x2',p:3.4,g:'buy'},{id:'fl',n:'Flansch DN40',p:8.9,g:'buy'}];
-var S={custs:[],quotes:[],cat:[],cid:null,job:null,sel:[],vals:{},picks:{},buys:[],files:[],rates:{cut:95,weld:75,bend:70,pik:65,wash:55,punch:70}};
-function load(){try{S.custs=JSON.parse(localStorage.getItem('wk2c')||'[]');S.quotes=JSON.parse(localStorage.getItem('wk2q')||'[]');S.cat=JSON.parse(localStorage.getItem('wk2k')||'null')||CAT0.slice();var r=JSON.parse(localStorage.getItem('wk2r')||'null');if(r)S.rates=r}catch(e){S.cat=CAT0.slice()}}
-function persist(){localStorage.setItem('wk2c',JSON.stringify(S.custs));localStorage.setItem('wk2q',JSON.stringify(S.quotes));localStorage.setItem('wk2k',JSON.stringify(S.cat));localStorage.setItem('wk2r',JSON.stringify(S.rates))}
-function show(id){['home','cust','part','setp'].forEach(function(x){$(x).classList.toggle('hidden',x!==id)})}
+var STEPS=[{k:'laser',n:'Laserzuschnitt',t:'mm',r:'cut',sp:'cut'},{k:'nipcut',n:'Nippelzuschnitt',t:'min',r:'cut'},{k:'nip',n:'Stanznippeln',t:'pc',r:'punch'},{k:'bend',n:'Abkanten',t:'bend',r:'bend'},{k:'mag',n:'MAG / MIG',t:'mm',r:'weld',sp:'mag'},{k:'wig',n:'WIG',t:'mm',r:'weld',sp:'wig'},{k:'lh',n:'Laserhand',t:'mm',r:'weld',sp:'lh'},{k:'lw',n:'Laserschweissen',t:'mm',r:'weld',sp:'lw'},{k:'bolt',n:'Bolzenschiessen',t:'pick',r:'weld',g:'bolt'},{k:'spot',n:'Punktschweissen',t:'pick',r:'weld',g:'nut'},{k:'pik',n:'Beizen',t:'min',r:'pik'},{k:'wash',n:'Reinigen / Waschen',t:'min',r:'wash'}];
+var CAT0=[{id:'b6',n:'Schweissbolzen M6',p:.22,g:'bolt'},{id:'b8',n:'Schweissbolzen M8',p:.28,g:'bolt'},{id:'b10',n:'Schweissbolzen M10',p:.35,g:'bolt'},{id:'n6',n:'Schweissmutter M6',p:.18,g:'nut'},{id:'n8',n:'Schweissmutter M8',p:.24,g:'nut'},{id:'n10',n:'Schweissmutter M10',p:.32,g:'nut'},{id:'bu1',n:'Buchse 8x12x10',p:1.1,g:'buy'},{id:'bu2',n:'Buchse 10x14x12',p:1.35,g:'buy'}];
+var S={custs:[],quotes:[],cat:[],cid:null,job:null,sel:[],vals:{},picks:{},buys:[],files:[],scale:0,segs:[],pt:null,rates:{cut:95,weld:75,bend:70,pik:65,wash:55,punch:70},spd:{mag:4,wig:2,lh:8,lw:10,cut:20,bend:25}};
+function load(){try{S.custs=JSON.parse(localStorage.getItem('wk2c')||'[]');S.quotes=JSON.parse(localStorage.getItem('wk2q')||'[]');S.cat=JSON.parse(localStorage.getItem('wk2k')||'null')||CAT0.slice();var r=JSON.parse(localStorage.getItem('wk2r')||'null');if(r)S.rates=r;var p=JSON.parse(localStorage.getItem('wk2s')||'null');if(p)S.spd=p}catch(e){S.cat=CAT0.slice()}}
+function persist(){localStorage.setItem('wk2c',JSON.stringify(S.custs));localStorage.setItem('wk2q',JSON.stringify(S.quotes));localStorage.setItem('wk2k',JSON.stringify(S.cat));localStorage.setItem('wk2r',JSON.stringify(S.rates));localStorage.setItem('wk2s',JSON.stringify(S.spd))}
+function show(id){['home','cust','part','setp','meas'].forEach(function(x){$(x).classList.toggle('hidden',x!==id)})}
 function goHome(){show('home');listCust()}
 function listCust(){var b=$('custList');if(!S.custs.length){b.innerHTML='<p class="muted">Noch kein Kunde.</p>';return}b.innerHTML=S.custs.map(function(c){var n=S.quotes.filter(function(q){return q.cid===c.id}).length;return '<article class="item" onclick="openC(\''+c.id+'\')"><strong>'+c.name+'</strong><div class="muted">'+c.nr+' · '+n+' Angebot(e)</div></article>'}).join('')}
 function openCustDlg(){$('dn').value='';$('dk').value='';$('dlg').showModal()}
 function okCust(){var n=$('dn').value.trim();if(!n)return;S.custs.push({id:uid(),name:n,nr:$('dk').value.trim()});persist();$('dlg').close();listCust()}
 function seed(){S.custs=[{id:'c1',name:'Bahntechnik Mueller',nr:'01'},{id:'c2',name:'Fahrzeugbau Huber',nr:'02'}];persist();listCust()}
-function openC(id){S.cid=id;var c=S.custs.filter(function(x){return x.id===id})[0];$('custTitle').textContent=c?c.name:'Kunde';var qs=S.quotes.filter(function(q){return q.cid===id});$('quoteList').innerHTML=qs.length?qs.map(function(q){return '<article class="item" onclick="openQ(\''+q.id+'\')"><strong>'+q.name+'</strong><div class="muted">'+(q.zn||'')+' · oeffnen</div><div class="ok">'+(q.grossTxt||'')+'</div></article>'}).join(''):'<p class="muted">Kein Angebot.</p>';show('cust')}
+function openC(id){S.cid=id;var c=S.custs.filter(function(x){return x.id===id})[0];$('custTitle').textContent=c?c.name:'Kunde';var qs=S.quotes.filter(function(q){return q.cid===id});$('quoteList').innerHTML=qs.length?qs.map(function(q){return '<article class="item" onclick="openQ(\''+q.id+'\')"><strong>'+q.name+'</strong><div class="muted">'+(q.zn||'')+'</div><div class="ok">'+(q.grossTxt||'')+'</div></article>'}).join(''):'<p class="muted">Kein Angebot.</p>';show('cust')}
 function backCust(){openC(S.cid)}
 function stepBy(k){for(var i=0;i<STEPS.length;i++) if(STEPS[i].k===k) return STEPS[i];return STEPS[0]}
 function catBy(id){for(var i=0;i<S.cat.length;i++) if(S.cat[i].id===id) return S.cat[i];return null}
@@ -151,28 +184,41 @@ function fillCat(){$('catSel').innerHTML='<option value="">Teil waehlen</option>
 function drawChips(){$('chips').innerHTML=STEPS.map(function(s){return '<button type="button" class="chip'+(S.sel.indexOf(s.k)>=0?' on':'')+'" onclick="tog(\''+s.k+'\')">'+s.n+'</button>'}).join('')}
 function tog(k){var i=S.sel.indexOf(k);if(i>=0)S.sel.splice(i,1);else S.sel.push(k);drawChips();drawSteps();sum()}
 function opts(g){return S.cat.filter(function(c){return c.g===g}).map(function(c){return '<option value="'+c.id+'">'+c.n+' · '+euro(c.p)+'</option>'}).join('')}
-function drawSteps(){var h='';S.sel.forEach(function(k){var s=stepBy(k);if(s.t==='pick'){var pk=S.picks[k]||{};h+='<div class="item"><strong>'+s.n+'</strong><label>Welcher Artikel<select id="pk_'+k+'" onchange="sum()">'+opts(s.g)+'</select></label><label>Stk je Fertigteil<input id="v_'+k+'" type="number" value="'+(pk.n||S.vals[k]||1)+'" oninput="sum()"></label></div>';}else{var lab=s.t==='bend'?'Kantungen je Stueck':s.t==='mm'?'Naht mm':s.t==='pc'?'Stueckzahl':'Minuten je Stueck';h+='<label>'+s.n+' — '+lab+'<input id="v_'+k+'" type="number" step="0.1" value="'+(S.vals[k]||'')+'" oninput="sum()"></label>';}});$('steps').innerHTML=h||'<p class="muted">Bearbeitung waehlen.</p>';S.sel.forEach(function(k){var s=stepBy(k);if(s.t==='pick'&&S.picks[k]&&$('pk_'+k)) $('pk_'+k).value=S.picks[k].id||'';})}
+function drawSteps(){var h='';S.sel.forEach(function(k){var s=stepBy(k);if(s.t==='pick'){var pk=S.picks[k]||{};h+='<div class="item"><strong>'+s.n+'</strong><label>Artikel<select id="pk_'+k+'" onchange="sum()">'+opts(s.g)+'</select></label><label>Stk je Teil<input id="v_'+k+'" type="number" value="'+(pk.n||S.vals[k]||1)+'" oninput="sum()"></label></div>';}else{var lab=s.t==='bend'?'Kantungen je Stueck':s.t==='mm'?'Laenge mm':s.t==='pc'?'Stueckzahl':'Minuten je Stueck';h+='<label>'+s.n+' — '+lab+'<input id="v_'+k+'" type="number" step="0.1" value="'+(S.vals[k]||'')+'" oninput="sum()"></label>';}});$('steps').innerHTML=h||'<p class="muted">Bearbeitung waehlen.</p>';S.sel.forEach(function(k){var s=stepBy(k);if(s.t==='pick'&&S.picks[k]&&$('pk_'+k))$('pk_'+k).value=S.picks[k].id||''})}
 function togFree(){var f=$('fmt').value==='f';$('freeBox').classList.toggle('hidden',!f);if(!f){var x=FM.filter(function(z){return z.id===$('fmt').value})[0];$('lenMm').value=x.L;$('widMm').value=x.B}}
 function size(){var id=$('fmt').value,f=FM.filter(function(z){return z.id===id})[0];return id!=='f'?f:{L:N($('lenMm').value),B:N($('widMm').value)}}
 function mat(){var id=$('materialSel').value;for(var i=0;i<MATS.length;i++) if(MATS[i].id===id) return MATS[i];return MATS[0]}
 function readVals(){S.sel.forEach(function(k){var el=$('v_'+k);if(el)S.vals[k]=N(el.value);var s=stepBy(k);if(s.t==='pick'&&$('pk_'+k)){var c=catBy($('pk_'+k).value);S.picks[k]={id:c?c.id:'',n:N(el&&el.value),p:c?c.p:0,nm:c?c.n:''}}})}
-function drawBuys(){var b=$('buys');if(!S.buys.length){b.innerHTML='<p class="muted">Kein Zukauf im Auftrag.</p>';return}b.innerHTML=S.buys.map(function(x,i){return '<article class="item"><strong>'+x.nme+'</strong><div class="muted">'+x.n+' je Stk · '+euro(x.p)+'</div><button type="button" class="btn ghost" onclick="delBuy('+i+')">Loeschen</button></article>'}).join('')}
+function drawBuys(){var b=$('buys');if(!S.buys.length){b.innerHTML='<p class="muted">Kein Zukauf.</p>';return}b.innerHTML=S.buys.map(function(x,i){return '<article class="item"><strong>'+x.nme+'</strong><div class="muted">'+x.n+' je Stk · '+euro(x.p)+'</div><button type="button" class="btn ghost" onclick="delBuy('+i+')">Loeschen</button></article>'}).join('')}
 function addBuy(){var c=catBy($('catSel').value);if(!c){alert('Teil waehlen');return}S.buys.push({id:c.id,nme:c.n,n:N($('catN').value)||1,p:N($('catP').value)||c.p});drawBuys();sum()}
 function delBuy(i){S.buys.splice(i,1);drawBuys();sum()}
-function drawFiles(){var b=$('thumbs');b.innerHTML=S.files.map(function(f,i){var inn=f.t==='img'?'<img src="'+f.d+'">':'<div class="filechip">PDF<br>'+f.n+'</div>';return '<div>'+inn+'<button type="button" class="btn ghost" onclick="delFile('+i+')">X</button></div>'}).join('')||'<p class="muted">Noch keine Datei.</p>'}
+function drawFiles(){var b=$('thumbs');b.innerHTML=S.files.map(function(f,i){var inn=f.t==='img'?'<img src="'+f.d+'">':'<div class="filechip">PDF<br>'+f.n+'</div>';return '<div>'+inn+'<button type="button" class="btn ghost" onclick="delFile('+i+')">X</button></div>'}).join('')||'<p class="muted">Noch kein Plan.</p>'}
 function delFile(i){S.files.splice(i,1);drawFiles()}
-function addFile(inp,img){var f=inp.files[0];if(!f)return;if(img){var r=new FileReader();r.onload=function(){var im=new Image();im.onload=function(){var c=document.createElement('canvas'),w=im.width,h=im.height,m=900;if(w>m){h=h*m/w;w=m}c.width=w;c.height=h;c.getContext('2d').drawImage(im,0,0,w,h);S.files.push({n:f.name,t:'img',d:c.toDataURL('image/jpeg',.65)});drawFiles()};im.src=r.result};r.readAsDataURL(f)}else{if(f.size>900000){alert('PDF zu gross');return}var r=new FileReader();r.onload=function(){S.files.push({n:f.name,t:'pdf',d:r.result});drawFiles()};r.readAsDataURL(f)}inp.value=''}
-function positions(){readVals();var q=N($('qty').value)||1,rows=[],s=size(),t=N($('thicknessMm').value),m=mat();var w=(!s.L||!s.B||!t)?0:s.L*s.B*t*m.d/1e6;rows.push({n:'Material '+m.n+' '+s.L+'x'+s.B+'x'+t+' ('+kg(w)+')',eur:w*1.15*m.e});S.sel.forEach(function(k){var st=stepBy(k),v=N(S.vals[k]),rate=S.rates[st.r]||70,eur=0,txt=st.n;if(st.t==='min'){eur=(v/60)*rate*q;txt=st.n+' '+v+' min je Stk'}else if(st.t==='bend'){eur=(v*25/60)*rate*q;txt=st.n+' '+v+' Kanten'}else if(st.t==='mm'){eur=(v/4/60)*rate*q;txt=st.n+' '+v+' mm'}else if(st.t==='pick'){var pk=S.picks[k]||{};eur=(N(pk.n)*8/60)*rate*q;txt=st.n+' Lohn';if(pk.nm){rows.push({n:txt,eur:eur});rows.push({n:pk.nm+' '+(N(pk.n)*q)+' Stk gesamt',eur:N(pk.n)*N(pk.p)*q});return}}else{eur=(v*8/60)*rate*q;txt=st.n+' '+v+' Stk'}rows.push({n:txt,eur:eur})});S.buys.forEach(function(b){rows.push({n:b.nme+' '+(N(b.n)*q)+' Stk gesamt',eur:N(b.n)*N(b.p)*q})});var net=0;rows.forEach(function(r){net+=r.eur});return {rows:rows,w:w,s:s,t:t,net:net,vat:net*.19,gross:net*1.19,q:q}}
+function addFile(inp,img){var f=inp.files[0];if(!f)return;if(img){var r=new FileReader();r.onload=function(){var im=new Image();im.onload=function(){var c=document.createElement('canvas'),w=im.width,h=im.height,m=1200;if(w>m){h=h*m/w;w=m}c.width=w;c.height=h;c.getContext('2d').drawImage(im,0,0,w,h);S.files.push({n:f.name,t:'img',d:c.toDataURL('image/jpeg',.7)});drawFiles()};im.src=r.result};r.readAsDataURL(f)}else{if(f.size>900000){alert('PDF zu gross');return}var r=new FileReader();r.onload=function(){S.files.push({n:f.name,t:'pdf',d:r.result});drawFiles()};r.readAsDataURL(f)}inp.value=''}
+function mmTime(mm,sp){var v=N(S.spd[sp])||1;return (N(mm)/v)/60}
+function positions(){readVals();var q=N($('qty').value)||1,rows=[],s=size(),t=N($('thicknessMm').value),m=mat();var w=(!s.L||!s.B||!t)?0:s.L*s.B*t*m.d/1e6;rows.push({n:'Material '+m.n+' ('+kg(w)+')',eur:w*1.15*m.e});S.sel.forEach(function(k){var st=stepBy(k),v=N(S.vals[k]),rate=S.rates[st.r]||70,eur=0,txt=st.n,min=0;if(st.t==='min'){min=v;eur=(min/60)*rate*q;txt=st.n+' '+v+' min je Stk'}else if(st.t==='bend'){min=(v*N(S.spd.bend))/60;eur=min*rate*q;txt=st.n+' '+v+' Kanten · '+(min*60).toFixed(0)+' s'}else if(st.t==='mm'){min=mmTime(v,st.sp||'mag');eur=min*rate*q;txt=st.n+' '+v+' mm · '+(min*60).toFixed(0)+' s je Stk'}else if(st.t==='pick'){var pk=S.picks[k]||{};eur=(N(pk.n)*8/60)*rate*q;txt=st.n+' Lohn';if(pk.nm){rows.push({n:txt,eur:eur});rows.push({n:pk.nm+' '+(N(pk.n)*q)+' Stk',eur:N(pk.n)*N(pk.p)*q});return}}else{eur=(v*8/60)*rate*q;txt=st.n+' '+v+' Stk'}rows.push({n:txt,eur:eur})});S.buys.forEach(function(b){rows.push({n:b.nme+' '+(N(b.n)*q)+' Stk',eur:N(b.n)*N(b.p)*q})});var net=0;rows.forEach(function(r){net+=r.eur});return {rows:rows,w:w,s:s,t:t,net:net,vat:net*.19,gross:net*1.19,q:q}}
 function sum(){var p=positions();$('autoKg').value=kg(p.w);$('autoHint').textContent=p.s.L+' x '+p.s.B+' x '+p.t+' mm';$('pos').innerHTML='<table><tr><th>Position</th><th class="r">Betrag</th></tr>'+p.rows.map(function(r){return '<tr><td>'+r.n+'</td><td class="r">'+euro(r.eur)+'</td></tr>'}).join('')+'</table>';$('cNet').textContent=euro(p.net);$('cVat').textContent=euro(p.vat);$('cGross').textContent=euro(p.gross)}
-function collect(){readVals();return {id:S.job&&S.job.id?S.job.id:uid(),cid:S.cid,name:$('pname').value.trim(),zn:$('drawingNo').value.trim(),qty:N($('qty').value)||1,mat:$('materialSel').value,th:$('thicknessMm').value,fmt:$('fmt').value,L:N($('lenMm').value),B:N($('widMm').value),sel:S.sel.slice(),vals:Object.assign({},S.vals),picks:JSON.parse(JSON.stringify(S.picks)),buys:JSON.parse(JSON.stringify(S.buys)),files:S.files.slice(),grossTxt:euro(positions().gross)}}
-function fillJob(j){S.job=j;S.sel=(j.sel||[]).slice();S.vals=Object.assign({},j.vals||{});S.picks=Object.assign({},j.picks||{});S.buys=(j.buys||[]).slice();S.files=(j.files||[]).slice();fillSel();drawChips();$('pname').value=j.name||'';$('drawingNo').value=j.zn||'';$('qty').value=j.qty||1;$('materialSel').value=j.mat||'S355JR';$('thicknessMm').value=j.th||'8.00';$('fmt').value=j.fmt||'k';$('lenMm').value=j.L||'';$('widMm').value=j.B||'';togFree();drawSteps();drawBuys();drawFiles();S.sel.forEach(function(k){if($('v_'+k))$('v_'+k).value=S.vals[k]||''});show('part');sum()}
-function newQuote(){fillJob({id:uid(),cid:S.cid,name:'',zn:'',qty:1,mat:'S355JR',th:'8.00',fmt:'k',L:2000,B:1000,sel:[],vals:{},picks:{},buys:[],files:[]})}
+function collect(){readVals();return {id:S.job&&S.job.id?S.job.id:uid(),cid:S.cid,name:$('pname').value.trim(),zn:$('drawingNo').value.trim(),qty:N($('qty').value)||1,mat:$('materialSel').value,th:$('thicknessMm').value,fmt:$('fmt').value,L:N($('lenMm').value),B:N($('widMm').value),sel:S.sel.slice(),vals:Object.assign({},S.vals),picks:JSON.parse(JSON.stringify(S.picks)),buys:JSON.parse(JSON.stringify(S.buys)),files:S.files.slice(),scale:S.scale,segs:S.segs.slice(),grossTxt:euro(positions().gross)}}
+function fillJob(j){S.job=j;S.sel=(j.sel||[]).slice();S.vals=Object.assign({},j.vals||{});S.picks=Object.assign({},j.picks||{});S.buys=(j.buys||[]).slice();S.files=(j.files||[]).slice();S.scale=j.scale||0;S.segs=j.segs||[];S.pt=null;fillSel();drawChips();$('pname').value=j.name||'';$('drawingNo').value=j.zn||'';$('qty').value=j.qty||1;$('materialSel').value=j.mat||'S355JR';$('thicknessMm').value=j.th||'8.00';$('fmt').value=j.fmt||'k';$('lenMm').value=j.L||'';$('widMm').value=j.B||'';togFree();drawSteps();drawBuys();drawFiles();S.sel.forEach(function(k){if($('v_'+k))$('v_'+k).value=S.vals[k]||''});show('part');sum()}
+function newQuote(){fillJob({id:uid(),cid:S.cid,name:'',zn:'',qty:1,mat:'S355JR',th:'8.00',fmt:'k',L:2000,B:1000,sel:[],vals:{},picks:{},buys:[],files:[],scale:0,segs:[]})}
 function openQ(id){var q=S.quotes.filter(function(x){return x.id===id})[0];if(q)fillJob(JSON.parse(JSON.stringify(q)))}
 function saveJob(){var j=collect();if(!j.name){alert('Bezeichnung angeben');return}S.quotes=S.quotes.filter(function(x){return x.id!==j.id});S.quotes.unshift(j);persist();openC(S.cid)}
-function openSet(){$('r_cut').value=S.rates.cut;$('r_weld').value=S.rates.weld;$('r_bend').value=S.rates.bend;$('r_pik').value=S.rates.pik;$('r_wash').value=S.rates.wash;$('r_punch').value=S.rates.punch;$('catEd').innerHTML=S.cat.map(function(c,i){return '<div class="item"><strong>'+c.n+'</strong> '+euro(c.p)+' <button type="button" class="btn ghost" onclick="delCat('+i+')">Loeschen</button></div>'}).join('');show('setp')}
+function spdTxt(){return 'MAG '+S.spd.mag+' mm/s · WIG '+S.spd.wig+' · Hand '+S.spd.lh+' · Laser '+S.spd.lw+' · Schnitt '+S.spd.cut+' · Kante '+S.spd.bend+' s'}
+function openSet(){$('r_cut').value=S.rates.cut;$('r_weld').value=S.rates.weld;$('r_bend').value=S.rates.bend;$('r_pik').value=S.rates.pik;$('r_wash').value=S.rates.wash;$('r_punch').value=S.rates.punch;$('spdShow').textContent=spdTxt();$('catEd').innerHTML=S.cat.map(function(c,i){return '<div class="item"><strong>'+c.n+'</strong> '+euro(c.p)+' <button type="button" class="btn ghost" onclick="delCat('+i+')">Loeschen</button></div>'}).join('');show('setp')}
 function addCat(){var n=$('cnm').value.trim();if(!n)return;S.cat.push({id:uid(),n:n,p:N($('cpr').value),g:$('ckd').value});$('cnm').value='';persist();openSet()}
 function delCat(i){S.cat.splice(i,1);persist();openSet()}
-function saveSet(){S.rates.cut=N($('r_cut').value);S.rates.weld=N($('r_weld').value);S.rates.bend=N($('r_bend').value);S.rates.pik=N($('r_pik').value);S.rates.wash=N($('r_wash').value);S.rates.punch=N($('r_punch').value);persist();alert('OK');goHome()}
+function saveSet(){S.rates.cut=N($('r_cut').value);S.rates.weld=N($('r_weld').value);S.rates.bend=N($('r_bend').value);S.rates.pik=N($('r_pik').value);S.rates.wash=N($('r_wash').value);S.rates.punch=N($('r_punch').value);if(N($('c_mag').value))S.spd.mag=50/N($('c_mag').value);if(N($('c_wig').value))S.spd.wig=50/N($('c_wig').value);if(N($('c_lh').value))S.spd.lh=50/N($('c_lh').value);if(N($('c_lw').value))S.spd.lw=50/N($('c_lw').value);if(N($('c_cut').value))S.spd.cut=50/N($('c_cut').value);if(N($('c_bend').value))S.spd.bend=N($('c_bend').value);persist();alert(spdTxt());goHome()}
+function firstImg(){for(var i=0;i<S.files.length;i++) if(S.files[i].t==='img') return S.files[i].d;return null}
+var IMG=null;
+function openMeas(){var src=firstImg();if(!src){alert('Zuerst ein Foto vom Plan machen.');return}IMG=new Image();IMG.onload=function(){var c=$('cv'),w=c.parentElement.clientWidth||320;c.width=w;c.height=Math.round(IMG.height*w/IMG.width);drawCv();show('meas');hintM()};IMG.src=src}
+function hintM(){$('mHint').textContent=S.scale?('Massstab ok. Jetzt '+$('mKind').options[$('mKind').selectedIndex].text+' antippen.'):'Massstab: bekanntes Mass, dann zwei Punkte tippen.'}
+function drawCv(){var c=$('cv'),g=c.getContext('2d');g.clearRect(0,0,c.width,c.height);if(IMG)g.drawImage(IMG,0,0,c.width,c.height);g.strokeStyle='#e8a23a';g.lineWidth=3;S.segs.forEach(function(s){g.beginPath();g.moveTo(s.x1,s.y1);g.lineTo(s.x2,s.y2);g.stroke()});if(S.pt){g.fillStyle='#3ecf8e';g.beginPath();g.arc(S.pt.x,S.pt.y,6,0,6.3);g.fill()}}
+function canvasXY(e){var c=$('cv'),r=c.getBoundingClientRect(),t=e.touches?e.touches[0]:e;return {x:(t.clientX-r.left)*c.width/r.width,y:(t.clientY-r.top)*c.height/r.height}}
+function onTap(e){e.preventDefault();var p=canvasXY(e);if(!S.pt){S.pt=p;drawCv();return}var a=S.pt,px=Math.hypot(p.x-a.x,p.y-a.y);S.pt=null;var kind=$('mKind').value;if(kind==='scale'){var mm=N($('knownMm').value);if(!mm||px<2){alert('Mass und zwei Punkte');drawCv();return}S.scale=mm/px;hintM();drawCv();return}if(!S.scale){alert('Zuerst Massstab');drawCv();return}var mm=px*S.scale;S.segs.push({x1:a.x,y1:a.y,x2:p.x,y2:p.y,k:kind,mm:mm});if(S.sel.indexOf(kind)<0)S.sel.push(kind);S.vals[kind]=(S.vals[kind]||0)+mm;drawCv();updM();drawChips();drawSteps();sum()}
+function updM(){var t={};S.segs.forEach(function(s){t[s.k]=(t[s.k]||0)+s.mm});$('mSum').innerHTML=Object.keys(t).map(function(k){var st=stepBy(k),min=mmTime(t[k],st.sp||'mag');return st.n+': '+t[k].toFixed(0)+' mm · ca. '+(min*60).toFixed(0)+' s'}).join('<br>')||'Noch keine Naht.'}
+function undoSeg(){var s=S.segs.pop();if(s){S.vals[s.k]=Math.max(0,(S.vals[s.k]||0)-s.mm);drawCv();updM();drawSteps();sum()}}
+$('cv').addEventListener('click',onTap);$('cv').addEventListener('touchend',onTap);
+$('mKind').onchange=hintM;
 $('catSel').onchange=function(){var c=catBy(this.value);if(c)$('catP').value=c.p};
 load();if(!S.custs.length)seed();listCust();
 </script></body></html>
