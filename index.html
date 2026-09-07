@@ -81,6 +81,16 @@ td.r{text-align:right}
 <div id="steps"></div>
 </section>
 <section class="card">
+<h2>Zukauf / Anschweisssteile</h2>
+<label>Aus Katalog<select id="catSel" onchange="onCatSel()"></select></label>
+<div class="grid2">
+<label>Stk je Fertigteil <input id="catN" type="number" value="1" min="1"></label>
+<label>EUR/Stk <input id="catP" type="number" step="0.01"></label>
+</div>
+<button type="button" class="btn ghost" onclick="addBuy()">In Kalkulation uebernehmen</button>
+<div id="buys"></div>
+</section>
+<section class="card">
 <h2>Positionen</h2>
 <div id="pos"></div>
 <div class="kpi">Netto <span class="ok" id="cNet">-</span></div>
@@ -93,7 +103,6 @@ td.r{text-align:right}
 <button type="button" class="btn ghost" onclick="goHome()">Zurueck</button>
 <section class="card">
 <h2>Stundensaetze EUR/h</h2>
-<p class="muted">Nur Preise. Zeiten waehlst du im Angebot.</p>
 <label>Laserschneiden <input id="r_cut" type="number"></label>
 <label>Stanznippeln <input id="r_nip" type="number"></label>
 <label>Stanzen <input id="r_punch" type="number"></label>
@@ -103,26 +112,25 @@ td.r{text-align:right}
 <label>Waschen / Reinigen <input id="r_wash" type="number"></label>
 <label>Bolzenschiessen <input id="r_bolt" type="number"></label>
 </section>
+<section class="card">
+<h2>Zukauf-Katalog</h2>
+<p class="muted">Wie Stundensaetze: hier anlegen, in der Kalkulation nur auswaehlen.</p>
+<div id="catEd"></div>
+<label>Bezeichnung <input id="cnm"></label>
+<label>Artikelnummer <input id="cart"></label>
+<label>Gruppe<select id="ckd"><option value="boltS">Schweissbolzen Stahl</option><option value="boltE">Schweissbolzen Edelstahl</option><option value="nutS">Schweissmutter Stahl</option><option value="nutE">Schweissmutter Edelstahl</option><option value="bush">Buchse</option><option value="buy">Sonstiges Zulieferteil</option></select></label>
+<label>EUR/Stk <input id="cpr" type="number" step="0.01"></label>
+<button type="button" class="btn ghost" onclick="addCat()">Teil speichern</button>
+</section>
 <button type="button" class="btn primary" onclick="saveSet()">Einstellungen speichern</button>
 </main>
-<dialog id="dlg">
-<h3 id="dlgT">Kunde</h3>
-<label>Firmenname <input id="dn"></label>
-<label>Kd-Nr <input id="dk"></label>
-<label>Strasse <input id="ds"></label>
-<label>PLZ <input id="dz"></label>
-<label>Ort <input id="do"></label>
-<div class="actions">
-<button type="button" class="btn ghost" onclick="document.getElementById('dlg').close()">Abbrechen</button>
-<button type="button" class="btn primary" onclick="okCust()">OK</button>
-</div>
-</dialog>
-<dialog id="bdlg">
-<h3>Zeit je Kantung waehlen</h3>
-<p class="muted">Tippe eine Zeile.</p>
-<div id="btab"></div>
-<button type="button" class="btn ghost" onclick="document.getElementById('bdlg').close()">Schliessen</button>
-</dialog>
+<dialog id="dlg"><h3 id="dlgT">Kunde</h3>
+<label>Firmenname <input id="dn"></label><label>Kd-Nr <input id="dk"></label>
+<label>Strasse <input id="ds"></label><label>PLZ <input id="dz"></label><label>Ort <input id="do"></label>
+<div class="actions"><button type="button" class="btn ghost" onclick="document.getElementById('dlg').close()">Abbrechen</button>
+<button type="button" class="btn primary" onclick="okCust()">OK</button></div></dialog>
+<dialog id="bdlg"><h3>Zeit je Kantung waehlen</h3><div id="btab"></div>
+<button type="button" class="btn ghost" onclick="document.getElementById('bdlg').close()">Schliessen</button></dialog>
 <script>
 function $(i){return document.getElementById(i)}
 function N(v){var n=parseFloat(String(v).replace(',','.'));return isFinite(n)?n:0}
@@ -133,14 +141,25 @@ var TH=['0.63','0.75','0.80','1.00','1.25','1.50','2.00','2.50','3.00','4.00','5
 var FM=[{id:'k',n:'Kleinformat 2000 x 1000',L:2000,B:1000},{id:'m',n:'Mittelformat 2500 x 1250',L:2500,B:1250},{id:'g',n:'Grossformat 3000 x 1500',L:3000,B:1500},{id:'f',n:'Freie Masse',L:0,B:0}];
 var MATS=[{id:'S235JR',n:'S235JR',d:7.85,e:1.20},{id:'S355JR',n:'S355JR',d:7.85,e:1.35},{id:'1.4301',n:'1.4301',d:8.00,e:4.80},{id:'1.4571',n:'1.4571',d:8.00,e:6.50}];
 var BEND=[{s:15,l:'15 Sekunden'},{s:25,l:'25 Sekunden'},{s:45,l:'45 Sekunden'},{s:60,l:'1 Minute'},{s:90,l:'1 Minute 30 Sekunden'},{s:120,l:'2 Minuten'},{s:180,l:'3 Minuten'},{s:300,l:'5 Minuten'}];
-var S={custs:[],quotes:[],cid:null,job:null,sel:[],v:{},files:[],edit:0,rates:{cut:95,nip:70,punch:70,bend:70,weld:75,pik:65,wash:55,bolt:70}};
+var GNAME={boltS:'Schweissbolzen Stahl',boltE:'Schweissbolzen Edelstahl',nutS:'Schweissmutter Stahl',nutE:'Schweissmutter Edelstahl',bush:'Buchse',buy:'Zulieferteil'};
+var CAT0=[{id:'bs6',n:'Schweissbolzen M6 Stahl',art:'SB-M6-S',p:.22,g:'boltS'},{id:'bs8',n:'Schweissbolzen M8 Stahl',art:'SB-M8-S',p:.28,g:'boltS'},{id:'bs10',n:'Schweissbolzen M10 Stahl',art:'SB-M10-S',p:.35,g:'boltS'},{id:'bs12',n:'Schweissbolzen M12 Stahl',art:'SB-M12-S',p:.48,g:'boltS'},{id:'be6',n:'Schweissbolzen M6 Edelstahl',art:'SB-M6-E',p:.42,g:'boltE'},{id:'be8',n:'Schweissbolzen M8 Edelstahl',art:'SB-M8-E',p:.55,g:'boltE'},{id:'be10',n:'Schweissbolzen M10 Edelstahl',art:'SB-M10-E',p:.68,g:'boltE'},{id:'ns6',n:'Schweissmutter M6 Stahl',art:'SM-M6-S',p:.18,g:'nutS'},{id:'ns8',n:'Schweissmutter M8 Stahl',art:'SM-M8-S',p:.24,g:'nutS'},{id:'ns10',n:'Schweissmutter M10 Stahl',art:'SM-M10-S',p:.32,g:'nutS'},{id:'ne6',n:'Schweissmutter M6 Edelstahl',art:'SM-M6-E',p:.36,g:'nutE'},{id:'ne8',n:'Schweissmutter M8 Edelstahl',art:'SM-M8-E',p:.48,g:'nutE'},{id:'bu1',n:'Buchse 8x12x10',art:'BU-081210',p:1.10,g:'bush'},{id:'bu2',n:'Buchse 10x14x12',art:'BU-101412',p:1.35,g:'bush'}];
+var S={custs:[],quotes:[],cat:[],buys:[],cid:null,job:null,sel:[],v:{},files:[],edit:0,rates:{cut:95,nip:70,punch:70,bend:70,weld:75,pik:65,wash:55,bolt:70}};
 function fillMats(){if(!$('materialSel'))return;$('materialSel').innerHTML=MATS.map(function(m){return '<option value="'+m.id+'">'+m.n+'</option>'}).join('');$('thicknessMm').innerHTML=TH.map(function(x){return '<option value="'+x+'">'+x.replace('.',',')+' mm</option>'}).join('');$('fmt').innerHTML=FM.map(function(f){return '<option value="'+f.id+'">'+f.n+'</option>'}).join('')}
+function catBy(id){for(var i=0;i<S.cat.length;i++) if(S.cat[i].id===id) return S.cat[i];return null}
+function fillCat(){if(!$('catSel'))return;$('catSel').innerHTML='<option value="">Teil waehlen</option>'+S.cat.map(function(c){return '<option value="'+c.id+'">'+(c.art?c.art+' · ':'')+c.n+'</option>'}).join('')}
+function onCatSel(){var c=catBy($('catSel').value);if(c)$('catP').value=c.p}
+function drawBuys(){var b=$('buys');if(!b)return;if(!S.buys.length){b.innerHTML='<p class="muted">Kein Zukauf in diesem Angebot.</p>';return}b.innerHTML=S.buys.map(function(x,i){return '<article class="item"><strong>'+x.n+'</strong><div class="muted">'+(x.art||'')+' · '+x.nStk+' je Stk · '+euro(x.p)+'</div><button type="button" class="btn ghost" onclick="delBuy('+i+')">Loeschen</button></article>'}).join('')}
+function addBuy(){var c=catBy($('catSel').value);if(!c){alert('Zuerst Teil im Katalog waehlen');return}S.buys.push({id:c.id,n:c.n,art:c.art||'',nStk:N($('catN').value)||1,p:N($('catP').value)||c.p});drawBuys();sum()}
+function delBuy(i){S.buys.splice(i,1);drawBuys();sum()}
+function drawCatEd(){if(!$('catEd'))return;$('catEd').innerHTML=S.cat.map(function(c,i){return '<div class="item"><strong>'+c.n+'</strong><div class="muted">'+(GNAME[c.g]||c.g)+' · '+(c.art||'ohne Nr.')+' · '+euro(c.p)+'</div><button type="button" class="btn ghost" onclick="delCat('+i+')">Loeschen</button></div>'}).join('')||'<p class="muted">Katalog leer.</p>'}
+function addCat(){var n=$('cnm').value.trim();if(!n){alert('Bezeichnung');return}S.cat.push({id:uid(),n:n,art:$('cart').value.trim(),p:N($('cpr').value),g:$('ckd').value});$('cnm').value='';$('cart').value='';persist();drawCatEd();fillCat()}
+function delCat(i){S.cat.splice(i,1);persist();drawCatEd();fillCat()}
 function mat(){var id=$('materialSel')?$('materialSel').value:'S355JR';for(var i=0;i<MATS.length;i++) if(MATS[i].id===id) return MATS[i];return MATS[1]}
 function onMat(){var m=mat();if($('eurKg')&&!N($('eurKg').value))$('eurKg').value=m.e}
 function togFree(){if(!$('fmt'))return;var f=$('fmt').value==='f';$('freeBox').classList.toggle('hidden',!f);if(!f){var x=FM.filter(function(z){return z.id===$('fmt').value})[0];$('lenMm').value=x.L;$('widMm').value=x.B}}
 function size(){var id=$('fmt').value,f=FM.filter(function(z){return z.id===id})[0];return id!=='f'?f:{L:N($('lenMm').value),B:N($('widMm').value)}}
-function load(){try{S.custs=JSON.parse(localStorage.getItem('wk4c')||localStorage.getItem('wk3c')||'[]');S.quotes=JSON.parse(localStorage.getItem('wk4q')||localStorage.getItem('wk3q')||'[]');var r=JSON.parse(localStorage.getItem('wk4r')||'null');if(r){for(var k in r)S.rates[k]=r[k]}}catch(e){}}
-function persist(){localStorage.setItem('wk4c',JSON.stringify(S.custs));localStorage.setItem('wk4q',JSON.stringify(S.quotes));localStorage.setItem('wk4r',JSON.stringify(S.rates))}
+function load(){try{S.custs=JSON.parse(localStorage.getItem('wk4c')||localStorage.getItem('wk3c')||'[]');S.quotes=JSON.parse(localStorage.getItem('wk4q')||localStorage.getItem('wk3q')||'[]');S.cat=JSON.parse(localStorage.getItem('wk4k')||'null')||CAT0.slice();var r=JSON.parse(localStorage.getItem('wk4r')||'null');if(r){for(var k in r)S.rates[k]=r[k]}}catch(e){S.cat=CAT0.slice()}}
+function persist(){localStorage.setItem('wk4c',JSON.stringify(S.custs));localStorage.setItem('wk4q',JSON.stringify(S.quotes));localStorage.setItem('wk4r',JSON.stringify(S.rates));localStorage.setItem('wk4k',JSON.stringify(S.cat))}
 function show(id){['home','cust','part','setp'].forEach(function(x){$(x).classList.toggle('hidden',x!==id)})}
 function goHome(){persist();show('home');listCust()}
 function curC(){for(var i=0;i<S.custs.length;i++) if(S.custs[i].id===S.cid) return S.custs[i];return null}
@@ -154,39 +173,22 @@ function stepBy(k){for(var i=0;i<STEPS.length;i++) if(STEPS[i].k===k) return STE
 function drawChips(){$('chips').innerHTML=STEPS.map(function(s){return '<button type="button" class="chip'+(S.sel.indexOf(s.k)>=0?' on':'')+'" onclick="tog(\''+s.k+'\')">'+s.n+'</button>'}).join('')}
 function tog(k){var i=S.sel.indexOf(k);if(i>=0)S.sel.splice(i,1);else S.sel.push(k);drawChips();drawSteps();sum()}
 function bendLab(){var s=N(S.v.bsec);for(var i=0;i<BEND.length;i++) if(BEND[i].s===s) return BEND[i].l;return s?(s+' Sekunden'):'noch nicht gewaehlt'}
-function drawSteps(){var h='';S.sel.forEach(function(k){var s=stepBy(k);
-if(s.t==='bend')h+='<div class="item"><strong>Abkanten</strong><label>Anzahl Kantungen<input id="v_bend" type="number" value="'+(S.v.bend||'')+'" oninput="sum()"></label><p class="muted">Zeit je Kantung: <b class="ok">'+bendLab()+'</b></p><button type="button" class="btn ghost" onclick="openBend()">Zeit-Tabelle oeffnen</button></div>';
-else if(s.t==='bolt')h+='<label>Bolzenschiessen Stueck je Teil<input id="v_bolt" type="number" value="'+(S.v.bolt||'')+'" oninput="sum()"></label>';
-else if(s.t==='spot')h+='<label>Punktschweissen Minuten je Fertigteil<input id="v_spot" type="number" step="0.1" value="'+(S.v.spot||'')+'" oninput="sum()"></label>';
-else if(s.t==='mm')h+='<label>'+s.n+' Gesamtlange mm<input id="v_'+k+'" type="number" value="'+(S.v[k]||'')+'" oninput="sum()"></label><label>Anzahl einzelne Naehte<input id="n_'+k+'" type="number" value="'+(S.v['n'+k]||1)+'" oninput="sum()"></label>';
-else h+='<label>'+s.n+' Minuten je Stueck<input id="v_'+k+'" type="number" step="0.1" value="'+(S.v[k]||'')+'" oninput="sum()"></label>';
-});$('steps').innerHTML=h||'<p class="muted">Bearbeitung oben antippen.</p>'}
+function drawSteps(){var h='';S.sel.forEach(function(k){var s=stepBy(k);if(s.t==='bend')h+='<div class="item"><strong>Abkanten</strong><label>Anzahl Kantungen<input id="v_bend" type="number" value="'+(S.v.bend||'')+'" oninput="sum()"></label><p class="muted">Zeit je Kantung: <b class="ok">'+bendLab()+'</b></p><button type="button" class="btn ghost" onclick="openBend()">Zeit-Tabelle oeffnen</button></div>';else if(s.t==='bolt')h+='<label>Bolzenschiessen Stueck je Teil<input id="v_bolt" type="number" value="'+(S.v.bolt||'')+'" oninput="sum()"></label>';else if(s.t==='spot')h+='<label>Punktschweissen Minuten je Fertigteil<input id="v_spot" type="number" step="0.1" value="'+(S.v.spot||'')+'" oninput="sum()"></label>';else if(s.t==='mm')h+='<label>'+s.n+' Gesamtlange mm<input id="v_'+k+'" type="number" value="'+(S.v[k]||'')+'" oninput="sum()"></label><label>Anzahl einzelne Naehte<input id="n_'+k+'" type="number" value="'+(S.v['n'+k]||1)+'" oninput="sum()"></label>';else h+='<label>'+s.n+' Minuten je Stueck<input id="v_'+k+'" type="number" step="0.1" value="'+(S.v[k]||'')+'" oninput="sum()"></label>';});$('steps').innerHTML=h||'<p class="muted">Bearbeitung oben antippen.</p>'}
 function openBend(){$('btab').innerHTML=BEND.map(function(b){return '<div class="item" onclick="pickBend('+b.s+')"><strong>'+b.l+'</strong></div>'}).join('');$('bdlg').showModal()}
 function pickBend(s){S.v.bsec=s;$('bdlg').close();drawSteps();sum()}
 function read(){S.sel.forEach(function(k){if($('v_'+k))S.v[k]=N($('v_'+k).value);if($('n_'+k))S.v['n'+k]=N($('n_'+k).value)})}
 function money(min,rate,q){return (N(min)/60)*N(rate)*N(q)}
-function calc(){read();var q=N($('qty').value)||1,rows=[],net=0;
-var sz=size(),th=N($('thicknessMm').value),m=mat(),ek=N($('eurKg').value)||m.e;
-var w=(!sz.L||!sz.B||!th)?0:sz.L*sz.B*th*m.d/1e6;
-if(w){var meur=w*1.10*ek*q;rows.push({n:'Material '+m.n+' '+sz.L+'x'+sz.B+'x'+th+' mm · '+w.toFixed(2).replace('.',',')+' kg',eur:meur});net+=meur}
-S.sel.forEach(function(k){var st=stepBy(k),rate=S.rates[st.r]||70,eur=0,txt=st.n,min=0;
-if(st.t==='bend'){var n=N(S.v.bend),sec=N(S.v.bsec)||25;min=n*sec/60;eur=money(min,rate,q);txt='Abkanten '+n+' x '+bendLab()+' = '+min.toFixed(2).replace('.',',')+' min'}
-else if(st.t==='bolt'){eur=0;txt='Bolzenschiessen '+N(S.v.bolt)+' Stk'}
-else if(st.t==='spot'){min=N(S.v.spot);eur=money(min,rate,q);txt='Punktschweissen '+min+' min'}
-else if(st.t==='mm'){var mm=N(S.v[k]),ns=Math.max(1,N(S.v['n'+k])||1);min=(mm/4+ns*15)/60;eur=money(min,rate,q);txt=st.n+' '+mm+' mm + '+ns+' Naehte · '+min.toFixed(2).replace('.',',')+' min (4 mm/s, 15 s Wenden)'}
-else {min=N(S.v[k]);eur=money(min,rate,q);txt=st.n+' '+min+' min je Stk'}
-rows.push({n:txt,eur:eur});net+=eur});
-return {rows:rows,net:net,vat:net*.19,gross:net*1.19,q:q,w:w,sz:sz,th:th}}
+function calc(){read();var q=N($('qty').value)||1,rows=[],net=0;var sz=size(),th=N($('thicknessMm').value),m=mat(),ek=N($('eurKg').value)||m.e;var w=(!sz.L||!sz.B||!th)?0:sz.L*sz.B*th*m.d/1e6;if(w){var meur=w*1.10*ek*q;rows.push({n:'Material '+m.n+' '+sz.L+'x'+sz.B+'x'+th+' mm · '+w.toFixed(2).replace('.',',')+' kg',eur:meur});net+=meur}S.sel.forEach(function(k){var st=stepBy(k),rate=S.rates[st.r]||70,eur=0,txt=st.n,min=0;if(st.t==='bend'){var n=N(S.v.bend),sec=N(S.v.bsec)||25;min=n*sec/60;eur=money(min,rate,q);txt='Abkanten '+n+' x '+bendLab()+' = '+min.toFixed(2).replace('.',',')+' min'}else if(st.t==='bolt'){eur=0;txt='Bolzenschiessen '+N(S.v.bolt)+' Stk'}else if(st.t==='spot'){min=N(S.v.spot);eur=money(min,rate,q);txt='Punktschweissen '+min+' min'}else if(st.t==='mm'){var mm=N(S.v[k]),ns=Math.max(1,N(S.v['n'+k])||1);min=(mm/4+ns*15)/60;eur=money(min,rate,q);txt=st.n+' '+mm+' mm + '+ns+' Naehte · '+min.toFixed(2).replace('.',',')+' min'}else {min=N(S.v[k]);eur=money(min,rate,q);txt=st.n+' '+min+' min je Stk'}rows.push({n:txt,eur:eur});net+=eur});S.buys.forEach(function(b){var eur=N(b.nStk)*N(b.p)*q;rows.push({n:(b.art?b.art+' · ':'')+b.n+' '+(N(b.nStk)*q)+' Stk',eur:eur});net+=eur});return {rows:rows,net:net,vat:net*.19,gross:net*1.19,q:q,w:w,sz:sz,th:th}}
 function sum(){var p=calc();if($('autoKg')){$('autoKg').value=(p.w?p.w.toFixed(2).replace('.',',')+' kg':'—');$('autoHint').textContent=p.sz.L+' x '+p.sz.B+' x '+p.th+' mm'}$('pos').innerHTML='<table><tr><th>Position</th><th class="r"></th></tr>'+p.rows.map(function(r){return '<tr><td>'+r.n+'</td><td class="r">'+euro(r.eur)+'</td></tr>'}).join('')+'</table>';$('cNet').textContent=euro(p.net);$('cVat').textContent=euro(p.vat);$('cGross').textContent=euro(p.gross)}
 function drawFiles(){var b=$('thumbs');b.innerHTML=S.files.map(function(f,i){var inn=f.t==='img'?'<img src="'+f.d+'">':'<div class="filechip">PDF<br>'+f.n+'</div>';return '<div>'+inn+'<button type="button" class="btn ghost noprint" onclick="delFile('+i+')">X</button></div>'}).join('')||'<p class="muted">Kein Plan.</p>'}
 function delFile(i){S.files.splice(i,1);drawFiles()}
 function addFile(inp,img){var f=inp.files[0];if(!f)return;if(img){var r=new FileReader();r.onload=function(){var im=new Image();im.onload=function(){var c=document.createElement('canvas'),w=im.width,h=im.height,m=1100;if(w>m){h=h*m/w;w=m}c.width=w;c.height=h;c.getContext('2d').drawImage(im,0,0,w,h);S.files.push({n:f.name,t:'img',d:c.toDataURL('image/jpeg',.68)});drawFiles()};im.src=r.result};r.readAsDataURL(f)}else{if(f.size>900000){alert('PDF zu gross');return}var r=new FileReader();r.onload=function(){S.files.push({n:f.name,t:'pdf',d:r.result});drawFiles()};r.readAsDataURL(f)}inp.value=''}
-function fillJob(j){S.job=j;S.sel=(j.sel||[]).slice();S.v=Object.assign({},j.v||{});S.files=(j.files||[]).slice();fillMats();$('pname').value=j.name||'';$('drawingNo').value=j.zn||'';$('qty').value=j.qty||1;$('materialSel').value=j.mat||'S355JR';$('thicknessMm').value=j.th||'8.00';$('fmt').value=j.fmt||'k';$('lenMm').value=j.L||2000;$('widMm').value=j.B||1000;$('eurKg').value=j.ek||mat().e;togFree();drawChips();drawSteps();drawFiles();show('part');sum()}
-function newQuote(){fillJob({id:uid(),cid:S.cid,name:'',zn:'',qty:1,mat:'S355JR',th:'8.00',fmt:'k',L:2000,B:1000,sel:[],v:{},files:[]})}
+function fillJob(j){S.job=j;S.sel=(j.sel||[]).slice();S.v=Object.assign({},j.v||{});S.files=(j.files||[]).slice();S.buys=(j.buys||[]).slice();fillMats();fillCat();$('pname').value=j.name||'';$('drawingNo').value=j.zn||'';$('qty').value=j.qty||1;$('materialSel').value=j.mat||'S355JR';$('thicknessMm').value=j.th||'8.00';$('fmt').value=j.fmt||'k';$('lenMm').value=j.L||2000;$('widMm').value=j.B||1000;$('eurKg').value=j.ek||mat().e;togFree();drawChips();drawSteps();drawFiles();drawBuys();show('part');sum()}
+function newQuote(){fillJob({id:uid(),cid:S.cid,name:'',zn:'',qty:1,mat:'S355JR',th:'8.00',fmt:'k',L:2000,B:1000,sel:[],v:{},files:[],buys:[]})}
 function openQ(id){var q=S.quotes.filter(function(x){return x.id===id})[0];if(q)fillJob(JSON.parse(JSON.stringify(q)))}
-function saveJob(){read();if(!$('pname').value.trim()){alert('Bezeichnung angeben');return}var p=calc();var j={id:S.job&&S.job.id?S.job.id:uid(),cid:S.cid,name:$('pname').value.trim(),zn:$('drawingNo').value.trim(),qty:N($('qty').value)||1,mat:$('materialSel').value,th:$('thicknessMm').value,fmt:$('fmt').value,L:N($('lenMm').value),B:N($('widMm').value),ek:N($('eurKg').value),sel:S.sel.slice(),v:Object.assign({},S.v),files:S.files.slice(),g:euro(p.gross)};S.quotes=S.quotes.filter(function(x){return x.id!==j.id});S.quotes.unshift(j);persist();openC(S.cid)}
-function openSet(){$('r_cut').value=S.rates.cut;$('r_nip').value=S.rates.nip;$('r_punch').value=S.rates.punch;$('r_bend').value=S.rates.bend;$('r_weld').value=S.rates.weld;$('r_pik').value=S.rates.pik;$('r_wash').value=S.rates.wash;$('r_bolt').value=S.rates.bolt;show('setp')}
+function saveJob(){read();if(!$('pname').value.trim()){alert('Bezeichnung angeben');return}var p=calc();var j={id:S.job&&S.job.id?S.job.id:uid(),cid:S.cid,name:$('pname').value.trim(),zn:$('drawingNo').value.trim(),qty:N($('qty').value)||1,mat:$('materialSel').value,th:$('thicknessMm').value,fmt:$('fmt').value,L:N($('lenMm').value),B:N($('widMm').value),ek:N($('eurKg').value),sel:S.sel.slice(),v:Object.assign({},S.v),files:S.files.slice(),buys:JSON.parse(JSON.stringify(S.buys)),g:euro(p.gross)};S.quotes=S.quotes.filter(function(x){return x.id!==j.id});S.quotes.unshift(j);persist();openC(S.cid)}
+function openSet(){drawCatEd();$('r_cut').value=S.rates.cut;$('r_nip').value=S.rates.nip;$('r_punch').value=S.rates.punch;$('r_bend').value=S.rates.bend;$('r_weld').value=S.rates.weld;$('r_pik').value=S.rates.pik;$('r_wash').value=S.rates.wash;$('r_bolt').value=S.rates.bolt;show('setp')}
 function saveSet(){S.rates.cut=N($('r_cut').value);S.rates.nip=N($('r_nip').value);S.rates.punch=N($('r_punch').value);S.rates.bend=N($('r_bend').value);S.rates.weld=N($('r_weld').value);S.rates.pik=N($('r_pik').value);S.rates.wash=N($('r_wash').value);S.rates.bolt=N($('r_bolt').value);persist();goHome()}
 function doPrint(){window.print()}
-load();fillMats();listCust();
+load();if(!S.cat.length)S.cat=CAT0.slice();fillMats();fillCat();listCust();
 </script></body></html>
